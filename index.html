@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charcos Gronchos, porqué los mejores lugares para refrescarte están en un río</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Charcos Gronchos</h1>
+        </div>
+    </header>
+
+    <div class="search-bar">
+        <div class="container">
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Busca por municipio o nombre del charco">
+                <button class="search-button">Buscar</button>
+            </div>
+        </div>
+    </div>
+
+    <main class="container">
+        <div class="sidebar">
+            <h3>Filtros</h3>
+            <form>
+                <div class="filter-group">
+                    <label for="climate">Clima:</label>
+                    <select id="climate">
+                        <option value="todos">Todos</option>
+                        <option value="calido">Cálido</option>
+                        <option value="templado">Templado</option>
+                        <option value="frio">Frío</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="town">Municipio:</label>
+                    <select id="town">
+                        <option value="todos">Todos</option>
+                        <option value="san-luis">San Luis</option>
+                        <option value="san-rafael">San Rafael</option>
+                        <option value="cisneros">Cisneros</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="rating">Calificación:</label>
+                    <select id="rating">
+                        <option value="todos">Todos</option>
+                        <option value="alta">9 y arriba</option>
+                        <option value="media">7 a 9</option>
+                        <option value="baja">Menos de 7</option>
+                    </select>
+                </div>
+                <button type="submit" class="filter-button">Aplicar Filtros</button>
+            </form>
+        </div>
+
+        <div class="card-container">
+            <div class="card">
+                <img src="https://orienteantioqueno.com/wp-content/uploads/2020/11/charco-cascada-la-planta-san-luis-oriente-antioque%C3%B1o-1200x480.jpg" alt="Charco Azul">
+                <div class="card-content">
+                    <h2>Charco la planta</h2>
+                    <p class="location">San Luis Antioquia</p>
+                    <div class="rating">
+                        <span class="rating-score">9.5</span>
+                        <span class="rating-text">Excelente · 254 opiniones</span>
+                    </div>
+                    <p class="description">Aguas cristalinas rodeadas de naturaleza</p>
+                </div>
+                <div class="card-hover-info">
+                    <p>Profundidad: 22 metros</p>
+                    <p>Acceso: Hay que bajar aproximadamente 600 escalas</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <img src="https://scontent-bog2-2.xx.fbcdn.net/v/t1.6435-9/141115806_188455699690994_6158244872973895794_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=833d8c&_nc_ohc=sheCcdW4EXcQ7kNvgEWkGpt&_nc_zt=23&_nc_ht=scontent-bog2-2.xx&_nc_gid=A0it5VKPDyzCm7jTSAwA-MR&oh=00_AYD4ZGHOk3Uhwncz9J3vhpsV8ib2aE1teLLKKqObxvXNJg&oe=673A043F" alt="Cascada del Bosque">
+                <div class="card-content">
+                    <h2>Charco Verde</h2>
+                    <p class="location">San Luis Antioquia</p>
+                    <div class="rating">
+                        <span class="rating-score">9.2</span>
+                        <span class="rating-text">Fantástico · 412 opiniones</span>
+                    </div>
+                    <p class="description">Impresionante caída de agua en entorno natural</p>
+                </div>
+                <div class="card-hover-info">
+                    <p>Altura de la cascada: 15 metros</p>
+                    <p>Acceso: Sendero de dificultad media</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <img src="https://hospedajesanrafaelantioquia.com/wp-content/uploads/2024/06/IMG_4021_compressed_2022_08_09_182009.jpg" alt="Poza Esmeralda">
+                <div class="card-content">
+                    <h2>Charco el taurete</h2>
+                    <p class="location">San Rafael Antioquia</p>
+                    <div class="rating">
+                        <span class="rating-score">9.9</span>
+                        <span class="rating-text">Lugar muy amplio con estadero para dejar parqueado los vehículos o para comprar refrescos o comida</span>
+                    </div>
+                    <p class="description">Remanso tranquilo de aguas verde esmeralda y con piedras para uno tirarse</p>
+                </div>
+                <div class="card-hover-info">
+                    <p>Hay rocas para tirar clavados gracias a la profundidad del charco</p>
+                    <p>Ideal para: Natación y picnic</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <img src="https://s0.wklcdn.com/image_29/873223/90720914/59260542Master.jpg" alt="Charco de la Luna">
+                <div class="card-content">
+                    <h2>Charco la represa</h2>
+                    <p class="location">Cisneros Antioquia</p>
+                    <div class="rating">
+                        <span class="rating-score">9.3</span>
+                        <span class="rating-text">Excepcional · 327 opiniones</span>
+                    </div>
+                    <p class="description">Lugar idóneo para terminar una larga caminata</p>
+                </div>
+                <div class="card-hover-info">
+                    <p>Acceso: Sendero de dificultad media</p>
+                    <p>Actividades: Natación y saltos</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>Desarrollado por <strong>Mateo Restrepo</strong></p>
+            <p><em>Universidad de Antioquia</em></p>
+            <p>Medellín, 2024</p>
+        </div>
+    </footer>
+</body>
+</html>
