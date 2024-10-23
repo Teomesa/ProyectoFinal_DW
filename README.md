@@ -2,9 +2,10 @@
 
 Mi propuesta para el proyecto final será sobre lugares para tirar charcos en Antioquía
 
-Tengo pensado de colocar en la pagina principal un filtrado con pueblos donde se pueda hacer esta actividad, con el porposito de que el usuario seleccione el pueblo de mayor interes 
+Tengo pensado de colocar en la pagina principal todos los charcos disponibles de dataset, ademas de barra de busqueda para realizar un filtrado con pueblos donde se pueda hacer esta actividad, con el proposito de que el usuario busque el pueblo de mayor interes.
+Luego desplegar solo los charcos disponibles para ese pueblo, en forma de tarjetas mostrar los diferentes charcos que hay con su nombre, ubicación, opiniones de otras personas, costo de entrada o si es publico y videos sobre el lugar (Si aplica)
 
-Luego desplegar en dicho pueblo seleccionado, desplegar en forma de tarjetas los diferentes charcos que hay como su nombre, ubicación, opiniones de otras personas, costo de entrada o si es publico y videos sobre el lugar (Si aplica)
+Quiero tambien realizar un registro o inicio de sesion para diferentes usuarios para realizar foros o comentarios de cada charco a modo de opiniones y hacer una calificacion por charco según las opiniones de los usuarios registrados. Tambien tener un usuario administrador que pueda supervisar y controlar la pagina
 
 Tambien lo ideal es que cuando uno seleccione un boton sobre "como llegar" se abrá la plataforma de google maps e indique la ruta para llegar a el
 
