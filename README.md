@@ -1,18 +1,39 @@
-# Proyecto: Sitios para tirar charco en Antioquia
+# Proyecto Final: Sitios para "Tirar Charco" en Antioquia
+# Objetivo del Proyecto:
+Este proyecto tiene como propósito ofrecer un portal interactivo y útil para los visitantes de Antioquia interesados en descubrir los mejores sitios para "tirar charco" (visitar piscinas naturales y ríos). La página mostrará un catálogo de estos sitios, con funcionalidades de búsqueda y filtrado, y permitirá la interacción y retroalimentación de los usuarios a través de opiniones, imágenes y calificaciones.
 
-Mi propuesta para el proyecto final será sobre lugares para tirar charcos en Antioquía
+# Características Principales
+- Página Principal:
+Visualización de todos los charcos disponibles en Antioquia con un catálogo basado en la base de datos.
+Barra de búsqueda para filtrar resultados, permitiendo al usuario buscar charcos por:
+- Nombre del Pueblo: Encuentra los charcos disponibles en una ubicación específica.
+- Nombre del Charco: Muestra detalles específicos del charco seleccionado.
 
-Tengo pensado de colocar en la pagina principal todos los charcos disponibles de dataset, ademas de barra de busqueda para realizar un filtrado con pueblos donde se pueda hacer esta actividad, con el proposito de que el usuario busque el pueblo de mayor interes.
-Luego desplegar solo los charcos disponibles para ese pueblo, en forma de tarjetas mostrar los diferentes charcos que hay con su nombre, ubicación, opiniones de otras personas, costo de entrada o si es publico y videos sobre el lugar (Si aplica)
+Cada charco se presentara en diseño de tarjetas que muestran información relevante de cada charco como lo son:
+- Nombre del Charco y Ubicación
+- Opiniones de otros usuarios
+- Costo de entrada o indicación si es público
+- Videos del lugar (si aplica)
 
-Quiero tambien realizar un registro o inicio de sesion para diferentes usuarios para realizar foros o comentarios de cada charco a modo de opiniones y hacer una calificacion por charco según las opiniones de los usuarios registrados. Tambien tener un usuario administrador que pueda supervisar y controlar la pagina
+# Registro e Inicio de Sesión:
+- Usuarios Comunes:
+Pueden explorar charcos, opinar, subir imágenes, guardar sitios favoritos y visualizar los charcos en tendencia según las opiniones.
+- Usuarios Administradores:
+Tienen permisos adicionales, como supervisar y moderar la plataforma, convertir a usuarios comunes en administradores, subir y administrar videos, y eliminar lugares o comentarios inapropiados.
 
-Tambien lo ideal es que cuando uno seleccione un boton sobre "como llegar" se abrá la plataforma de google maps e indique la ruta para llegar a el
+# Tecnologías Utilizadas
+- HTML y CSS: Para la estructura y estilo del contenido, creando una interfaz atractiva y organizada.
+- JavaScript: Para manejar la interacción del usuario y la carga dinámica de contenido en la página.
+- Node.js: En el backend, gestionando las peticiones, la lógica del servidor y la conexión con la base de datos.
+- MySQL: Para el almacenamiento y gestión de datos de los charcos, opiniones, usuarios, y tendencias.
 
-# Tecnologias a usar
+# Despliegue y Contenedores en Docker
+El proyecto se desplegará utilizando contenedores Docker. Se crearán los siguientes contenedores:
+- Backend: Contenedor que ejecuta el servidor Node.js y gestiona las operaciones lógicas y conexiones de datos.
+- Base de Datos: Contenedor de MySQL para almacenar información sobre los charcos, usuarios y opiniones.
+- Frontend: Contenedor para el servidor web encargado de servir el contenido estático (HTML, CSS, JS).
+Docker Compose se utilizará para simplificar la configuración y la comunicación entre estos contenedores.
 
--HTML: Para estructurar el contenido de la página web.
--CSS: Para estilizar y hacer que la interfaz sea visualmente atractiva.
--JavaScript: Para manejar la lógica de interacción del usuario y la manipulación dinámica del contenido.
--Node.js: Para la creación del sevvidor y el manejo de peticiones en back-end
--MySQL: para almacenar información sobre los charcos, opiniones de usuarios y más.
+# Expansión y Mejoras Futuras
+Integración Completa con Google Maps: Permitir que los usuarios obtengan direcciones detalladas con un solo clic desde la página.
+Sugerencias Basadas en Preferencias del Usuario: Proporcionar recomendaciones personalizadas de charcos en función de las interacciones previas y opiniones del usuario.
