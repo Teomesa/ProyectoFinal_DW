@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charcos Antioquia - Explorar</title>
+    <link rel="stylesheet" href="css/mostrar-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+</head>
+<body>
+    <header>
+        <div class="logo">
+            Charcos Antioquia
+        </div>
+
+        <div class="user-profile">
+            <button id="favorites-btn" class="btn btn-outline">
+                <i class="fas fa-heart"></i> Favoritos
+            </button>
+            <div class="user-info">
+                <span id="user-name"></span>
+                <button id="logout-btn" class="btn btn-outline">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <section class="search-section">
+        <div class="search-container">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-input" placeholder="Buscar charcos...">
+            </div>
+        </div>
+    </section>
+
+    <main class="main-container">
+        <!-- Sección de filtros -->
+        <aside class="filter-section">
+            <div class="filter-group">
+                <h3>Clima</h3>
+                <div class="filter-options">
+                    <span class="filter-option active">Todos</span>
+                    <span class="filter-option">Cálido</span>
+                    <span class="filter-option">Templado</span>
+                    <span class="filter-option">Frío</span>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <h3>Municipio</h3>
+                <div class="filter-options">
+                    <span class="filter-option active">Todos</span>
+                    <span class="filter-option">San Luis</span>
+                    <span class="filter-option">San Rafael</span>
+                    <span class="filter-option">Cisneros</span>
+                </div>
+            </div>
+
+            <div class="filter-group">
+                <h3>Calificación</h3>
+                <div class="filter-options">
+                    <span class="filter-option active">Todos</span>
+                    <span class="filter-option">9 y arriba</span>
+                    <span class="filter-option">7 a 9</span>
+                    <span class="filter-option">Menos de 7</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Contenedor de charcos -->
+        <div id="charcos-container" class="card-container">
+            <!-- Los charcos se cargarán dinámicamente aquí -->
+        </div>
+    </main>
+
+    <footer>
+        <p>Desarrollado por <strong>Mateo Restrepo</strong></p>
+        <p>Universidad de Antioquia</p>
+        <p>Medellín, 2024</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js"></script>
+    <script type="module" src="js/services/authService.js"></script>
+    <script type="module" src="js/charcos.js"></script>
+    
+    <script type="module">
+        import AuthService from './js/services/authService.js';
+
+        // Verificar autenticación al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!AuthService.isAuthenticated()) {
+                window.location.href = '/auth-form.html';
+                return;
+            }
+
+            // Mostrar nombre del usuario
+            const user = AuthService.getCurrentUser();
+            if (user) {
+                document.getElementById('user-name').textContent = user.nombre;
+            }
+
+            // Manejar cierre de sesión
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                AuthService.logout();
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Obtener y mostrar el nombre del usuario
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user && user.nombre) {
+                document.getElementById('user-name').textContent = user.nombre;
+            }
+    
+            // Animación suave para el header al hacer scroll
+            let lastScroll = 0;
+            window.addEventListener('scroll', () => {
+                const currentScroll = window.pageYOffset;
+                const header = document.querySelector('header');
+                
+                if (currentScroll > lastScroll && currentScroll > 100) {
+                    header.style.transform = 'translateY(-100%)';
+                    header.style.transition = 'transform 0.3s ease';
+                } else {
+                    header.style.transform = 'translateY(0)';
+                }
+                lastScroll = currentScroll;
+            });
+        });
+    </script>
+</body>
+</html>

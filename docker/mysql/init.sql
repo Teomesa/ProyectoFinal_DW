@@ -2,27 +2,19 @@
 SET NAMES utf8mb4;
 SET CHARACTER SET utf8mb4;
 
--- Eliminar la base de datos si existe
-DROP DATABASE IF EXISTS charcos_db;
+-- Crear la base de datos si no existe
+CREATE DATABASE IF NOT EXISTS charcos_db;
 
--- Crear la base de datos
-CREATE DATABASE charcos_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- Usar la base de datos
+-- Asegurarse de usar la base de datos correcta
 USE charcos_db;
 
--- Crear tabla municipio
-CREATE TABLE municipio (
-    id_municipio INT PRIMARY KEY AUTO_INCREMENT,
-    nombre VARCHAR(100) NOT NULL,
-    descripcion TEXT,
-    ubicacion VARCHAR(255),
-    temperatura INT,
-    clima FLOAT
-);
+-- Asegurarse de que el usuario tenga los permisos correctos
+CREATE USER IF NOT EXISTS 'charcos_user'@'%' IDENTIFIED BY '2901';
+GRANT ALL PRIVILEGES ON charcos_db.* TO 'charcos_user'@'%';
+FLUSH PRIVILEGES;
 
--- Crear tabla usuarios
-CREATE TABLE usuarios (
+-- Crear tabla usuarios si no existe
+CREATE TABLE IF NOT EXISTS usuarios (
     id_usuario INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
@@ -31,10 +23,20 @@ CREATE TABLE usuarios (
     fecha_registro DATE DEFAULT (CURRENT_DATE()),
     edad INT,
     foto_perfil VARCHAR(255)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Crear tabla municipio
+CREATE TABLE IF NOT EXISTS municipio (
+    id_municipio INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(100) NOT NULL,
+    descripcion TEXT,
+    ubicacion VARCHAR(255),
+    temperatura INT,
+    clima FLOAT
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Crear tabla charco
-CREATE TABLE charco (
+CREATE TABLE IF NOT EXISTS charco (
     id_charco INT PRIMARY KEY AUTO_INCREMENT,
     descripcion TEXT,
     nombre VARCHAR(100) NOT NULL,
@@ -46,20 +48,20 @@ CREATE TABLE charco (
     longitud FLOAT,
     calificacion INT,
     FOREIGN KEY (id_municipio) REFERENCES municipio(id_municipio)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Crear tabla multimedia
-CREATE TABLE multimedia (
+CREATE TABLE IF NOT EXISTS multimedia (
     id_multimedia INT PRIMARY KEY AUTO_INCREMENT,
     id_charco INT,
     url VARCHAR(255) NOT NULL,
     descripcion TEXT,
     principal BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (id_charco) REFERENCES charco(id_charco)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Crear tabla opinion
-CREATE TABLE opinion (
+CREATE TABLE IF NOT EXISTS opinion (
     id_opinion INT PRIMARY KEY AUTO_INCREMENT,
     id_usuario INT,
     id_charco INT,
@@ -69,10 +71,10 @@ CREATE TABLE opinion (
     calificacion INT,
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
     FOREIGN KEY (id_charco) REFERENCES charco(id_charco)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Crear tabla favorito
-CREATE TABLE favorito (
+CREATE TABLE IF NOT EXISTS favorito (
     id_lugar INT PRIMARY KEY AUTO_INCREMENT,
     id_usuario INT,
     id_charco INT,
@@ -80,7 +82,7 @@ CREATE TABLE favorito (
     FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario),
     FOREIGN KEY (id_charco) REFERENCES charco(id_charco),
     UNIQUE KEY unique_favorito (id_usuario, id_charco)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Insertar datos de ejemplo en municipio
 INSERT INTO municipio (nombre, descripcion, ubicacion, temperatura, clima) VALUES
@@ -91,7 +93,7 @@ INSERT INTO municipio (nombre, descripcion, ubicacion, temperatura, clima) VALUE
 -- Insertar datos de ejemplo en usuarios
 INSERT INTO usuarios (nombre, email, password, tipo_usuario, edad) VALUES
 ('Admin User', 'admin@charcos.com', 'hashedpassword123', TRUE, 30),
-('Normal User', 'user@email.com', 'hashedpassword456', FALSE, 25);
+('Normal User', 'user@email.com', '$2a$10$YourGeneratedHashHere', FALSE, 25);
 
 -- Insertar datos de ejemplo en charco
 INSERT INTO charco (nombre, descripcion, profundidad, es_publico, costo, id_municipio, latitud, longitud, calificacion) VALUES
