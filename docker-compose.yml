@@ -2,45 +2,60 @@ version: '3.8'
 
 services:
   backend:
-    build: ./backend
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     volumes:
-      - ./backend:/usr/src/app
-      - /usr/src/app/node_modules
+      - type: bind
+        source: ./backend
+        target: /usr/src/app/backend
+      - type: bind
+        source: ./frontend
+        target: /usr/src/app/frontend
+      - /usr/src/app/backend/node_modules
+    working_dir: /usr/src/app/backend
     environment:
       - NODE_ENV=development
       - PORT=3000
       - DB_HOST=db
       - DB_USER=charcos_user
-      - DB_PASSWORD=charcos_password
+      - DB_PASSWORD=2901
       - DB_NAME=charcos_db
-      - JWT_SECRET=your_jwt_secret_key
+      - JWT_SECRET=tu_secreto_super_seguro_aqui_123
     depends_on:
       db:
         condition: service_healthy
     networks:
       - app-network
+    restart: unless-stopped
 
   db:
     image: mysql:8.0
+    command: 
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
     ports:
       - "3306:3306"
     environment:
       - MYSQL_DATABASE=charcos_db
       - MYSQL_USER=charcos_user
-      - MYSQL_PASSWORD=charcos_password
-      - MYSQL_ROOT_PASSWORD=root_password
+      - MYSQL_PASSWORD=2901
+      - MYSQL_ROOT_PASSWORD=2901
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p2901"]
       interval: 5s
       timeout: 5s
-      retries: 20
+      retries: 10
+      start_period: 30s
     networks:
       - app-network
+    restart: unless-stopped
 
   adminer:
     image: adminer
@@ -50,6 +65,7 @@ services:
       - db
     networks:
       - app-network
+    restart: unless-stopped
 
 networks:
   app-network:
@@ -57,3 +73,4 @@ networks:
 
 volumes:
   mysql_data:
+    name: charcos_mysql_data

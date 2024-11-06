@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charcos Antioquia</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="logo">
+        Charcos Antioquia
+    </div>
+
+    <div class="nav-buttons">
+        <a href="#login-modal" class="btn btn-outline">Iniciar Sesión</a>
+        <a href="#register-modal" class="btn btn-primary">Registrarse</a>
+    </div>
+
+    <div class="hero">
+        <h1>Descubre los Mejores Charcos de Antioquia</h1>
+        <p>Explora lugares mágicos, comparte experiencias inolvidables y planea tu
+        próxima aventura con nuestra comunidad de exploradores.</p>
+        <a href="#register-modal" class="btn btn-primary">¡Comienza tu Aventura!</a>
+    </div>
+
+    <div class="features">
+        <div class="feature-card glass-effect">
+            <h3>Descubre Lugares Únicos</h3>
+            <p>Accede a nuestra base de datos exclusiva de charcos y cascadas, con
+            información detallada y fotos reales.</p>
+            <a href="#login-modal" class="btn btn-outline">Ver Lugares</a>
+        </div>
+
+        <div class="feature-card glass-effect">
+            <h3>Planea tu Viaje</h3>
+            <p>Obtén información detallada sobre rutas, clima, mejores épocas para
+            visitar y consejos de la comunidad.</p>
+            <a href="#login-modal" class="btn btn-outline">Planear Ahora</a>
+        </div>
+
+        <div class="feature-card glass-effect">
+            <h3>Únete a la Comunidad</h3>
+            <p>Comparte experiencias, consejos y conoce a otros aventureros apasionados
+            por la naturaleza.</p>
+            <a href="#register-modal" class="btn btn-outline">Unirme</a>
+        </div>
+    </div>
+
+    <div class="cta-banner">
+        <h2>¿Listo para tu próxima aventura?</h2>
+        <p>Únete a nuestra comunidad y descubre lugares increíbles</p>
+        <a href="#register-modal" class="btn btn-final">Crear Cuenta Gratis</a>
+    </div>
+
+    <footer>
+        <p>© 2024 Charcos Antioquia - Todos los derechos reservados</p>
+        <p>Desarrollado por Mateo Restrepo Mesa</p>
+    </footer>
+
+    <!-- Los modales se insertarán dinámicamente aquí -->
+
+<script type="module">
+    import AuthModalManager from './js/auth-modal.js';
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        // Limpiar el almacenamiento si es necesario
+        if (window.location.search.includes('logout=true')) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+        }
+        
+        // Verificar autenticación
+        const token = localStorage.getItem('token');
+        if (token) {
+            window.location.href = '/Mostrar.html';
+            return;
+        }
+        
+        // Inicializar el manejador de modales
+        AuthModalManager.init();
+    });
+</script>
+</body>
+</html>
