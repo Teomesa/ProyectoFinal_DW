@@ -43,6 +43,7 @@ CREATE TABLE IF NOT EXISTS charco (
     profundidad INT,
     es_publico BOOLEAN DEFAULT TRUE,
     costo FLOAT,
+    clima TEXT,
     id_municipio INT,
     latitud FLOAT,
     longitud FLOAT,
@@ -98,13 +99,12 @@ INSERT INTO usuarios (nombre, email, password, tipo_usuario, edad) VALUES
 ('Administrador', 'admin@charcos.com','$2a$10$zOqBTgbXFtbBX.KE1amYWu1iR3Guqg6sFOPESEkIpgt406imL67jO',TRUE,30),
 ('Mateo', 'restrepomate@gmail.com','$2a$10$IxcsAvm0vIUXw9/UU3s1DeIoGpQkO0LI/7vRiDtNlHPmnFOAS76Iq',FALSE,22);
 
-
 -- Insertar datos de ejemplo en charco
-INSERT INTO charco (nombre, descripcion, profundidad, es_publico, costo, id_municipio, latitud, longitud, calificacion) VALUES
-('Charco la planta', 'Aguas cristalinas rodeadas de naturaleza', 22, TRUE, 0, 1, 6.0444, -75.0244, 9),
-('Charco Verde', 'Impresionante caida de agua en entorno natural', 15, TRUE, 5000, 1, 6.0445, -75.0245, 9),
-('Charco el taurete', 'Remanso tranquilo de aguas verde esmeralda', 18, TRUE, 0, 2, 6.3018, -75.0244, 10),
-('Charco la represa', 'Lugar idoneo para terminar una larga caminata', 12, FALSE, 10000, 3, 6.5392, -75.0904, 9);
+INSERT INTO charco (nombre, descripcion, profundidad, es_publico, costo, clima, id_municipio, latitud, longitud, calificacion) VALUES
+('Charco la planta', 'Aguas cristalinas rodeadas de naturaleza', 22, TRUE, 0, 'Templado', 1, 6.0444, -75.0244, 9),
+('Charco Verde', 'Impresionante caida de agua en entorno natural', 15, TRUE, 5000, 'Cálido', 1, 6.0445, -75.0245, 9),
+('Charco el taurete', 'Remanso tranquilo de aguas verde esmeralda', 18, TRUE, 0, 'Frío', 2, 6.3018, -75.0244, 10),
+('Charco la represa', 'Lugar idoneo para terminar una larga caminata', 12, FALSE, 10000, 'Templado', 3, 6.5392, -75.0904, 9);
 
 -- Insertar datos de ejemplo en multimedia
 INSERT INTO multimedia (id_charco, url, descripcion, principal) VALUES

@@ -33,16 +33,19 @@
         </div>
     </header>
 
-    <section class="search-section">
+    <div class="search-section">
         <div class="search-container">
             <div class="search-bar">
                 <i class="fas fa-search"></i>
-                <input type="text" id="search-input" placeholder="Buscar charcos...">
+                <input 
+                    type="text" 
+                    placeholder="Buscar por nombre de charco o municipio..."
+                    aria-label="Buscar charcos">
             </div>
         </div>
-    </section>
+    </div>
 
-    <main class="main-container">
+    <div class="main-container">
         <!-- Sección de filtros -->
         <aside class="filter-section">
             <div class="filter-group">
@@ -78,10 +81,13 @@
         <div id="charcos-container" class="card-container">
             <!-- Los charcos se cargarán aquí dinámicamente -->
         </div>
-    </main>
+    </div>
+
+    <div id="charcos-container" class="card-container">
+        <!-- Los charcos se cargarán aquí -->
+    </div>
 
     <!-- Scripts -->
-    <script src="https://kit.fontawesome.com/your-fontawesome-kit.js"></script>
     <script type="module" src="js/services/authService.js"></script>
     <script type="module" src="js/charcos.js"></script>
     <script type="module" src="/js/userInterface.js"></script>

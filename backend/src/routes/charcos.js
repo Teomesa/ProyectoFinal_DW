@@ -15,21 +15,18 @@ router.get('/', async (req, res) => {
                 c.*,
                 m.nombre as municipio_nombre,
                 m.ubicacion as municipio_ubicacion,
-                mm.url as imagen_principal,
-                CASE WHEN f.id_lugar IS NOT NULL THEN TRUE ELSE FALSE END as is_favorite
+                mm.url as imagen_principal
             FROM charco c
             LEFT JOIN municipio m ON c.id_municipio = m.id_municipio
             LEFT JOIN multimedia mm ON c.id_charco = mm.id_charco AND mm.principal = TRUE
-            LEFT JOIN favorito f ON f.id_charco = c.id_charco AND f.id_usuario = ?
-        `, [req.user.id_usuario]);
-
+        `);
+        
+        console.log('Charcos encontrados:', charcos);
         res.json(charcos);
     } catch (error) {
         console.error('Error:', error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ message: 'Error al obtener los charcos' });
     }
 });
-
-// Resto de las rutas...
 
 module.exports = router;
