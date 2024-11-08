@@ -36,17 +36,20 @@ class AuthService {
                 },
                 body: JSON.stringify(credentials)
             });
-
+    
             const data = await response.json();
             
             if (!response.ok) {
                 throw new Error(data.message || 'Error en el login');
             }
-
-            // Guardar el token en localStorage
+    
+            // Guardar el token y la información del usuario
             localStorage.setItem('token', data.token);
             localStorage.setItem('user', JSON.stringify(data.user));
-
+    
+            // Redirigir a Mostrar.html para todos los usuarios
+            window.location.href = '/Mostrar.html';
+    
             return data;
         } catch (error) {
             throw error;

@@ -64,14 +64,12 @@ router.post('/login', async (req, res) => {
 // Ruta de registro
 router.post('/register', async (req, res) => {
     try {
-        console.log('Datos recibidos para registro:', req.body);
         const { nombre, email, password, edad } = req.body;
 
-        // Validación mejorada
+        // Validación
         if (!nombre || !email || !password || !edad) {
             return res.status(400).json({
-                message: 'Todos los campos son requeridos',
-                received: { nombre, email, password: '***', edad }
+                message: 'Todos los campos son requeridos'
             });
         }
 
@@ -91,47 +89,30 @@ router.post('/register', async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
-        // Insertar el nuevo usuario
+        // Insertar el nuevo usuario con la fecha actual
         const [result] = await pool.query(
-            `INSERT INTO usuarios (nombre, email, password, edad) 
-             VALUES (?, ?, ?, ?)`,
+            'INSERT INTO usuarios (nombre, email, password, edad) VALUES (?, ?, ?, ?)',
             [nombre, email, hashedPassword, edad]
         );
-
+        
         console.log('Usuario insertado:', result);
-
-        // Verificar que el usuario se insertó correctamente
-        if (result.affectedRows !== 1) {
-            throw new Error('Error al insertar usuario');
-        }
-
-        // Verificar que el usuario existe en la base de datos
-        const [newUser] = await pool.query(
-            'SELECT id_usuario, nombre, email FROM usuarios WHERE id_usuario = ?',
-            [result.insertId]
-        );
-
-        if (newUser.length === 0) {
-            throw new Error('No se pudo verificar la creación del usuario');
-        }
 
         res.status(201).json({
             message: 'Usuario registrado exitosamente',
             user: {
-                id: newUser[0].id_usuario,
-                nombre: newUser[0].nombre,
-                email: newUser[0].email
+                id: result.insertId,
+                nombre,
+                email
             }
         });
 
     } catch (error) {
-        console.error('Error detallado en registro:', error);
+        console.error('Error en registro:', error);
         res.status(500).json({
             message: 'Error al registrar usuario',
             error: error.message
         });
     }
 });
-
 
 module.exports = router;

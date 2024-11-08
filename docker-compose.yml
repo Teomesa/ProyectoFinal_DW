@@ -37,6 +37,7 @@ services:
       - --default-authentication-plugin=mysql_native_password
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
+      - --default-time-zone=-05:00
     ports:
       - "3306:3306"
     environment:
@@ -44,6 +45,7 @@ services:
       - MYSQL_USER=charcos_user
       - MYSQL_PASSWORD=2901
       - MYSQL_ROOT_PASSWORD=2901
+      - TZ=America/Bogota 
     volumes:
       - mysql_data:/var/lib/mysql
       - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro

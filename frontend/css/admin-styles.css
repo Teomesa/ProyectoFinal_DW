@@ -1,0 +1,153 @@
+/* Contenedor principal */
+.admin-container {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Estilos para las pestañas */
+.admin-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+}
+
+.tab-btn {
+    padding: 0.8rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    background: var(--glass-bg);
+    color: var(--light);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+.tab-btn.active {
+    background: linear-gradient(45deg, var(--secondary), #45b7af);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(78, 205, 196, 0.3);
+}
+
+.tab-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Contenido de las pestañas */
+.tab-content {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Mejoras en la tabla */
+.table-container {
+    overflow-x: auto;
+    border-radius: 12px;
+    background: var(--glass-bg);
+    padding: 1rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 1rem 0;
+}
+
+th {
+    background: rgba(0, 0, 0, 0.3);
+    color: var(--accent);
+    padding: 1.2rem 1rem;
+    font-weight: 600;
+    text-align: left;
+    font-size: 0.95rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+td {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.95rem;
+}
+
+tr:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Badges mejorados */
+.badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.badge.admin {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    color: #000;
+}
+
+.badge.user {
+    background: linear-gradient(45deg, #4ecdc4, #45b7af);
+    color: white;
+}
+
+/* Botones de acción */
+.action-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 20px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    margin: 0.2rem;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+}
+
+.toggle-admin-btn {
+    background: linear-gradient(45deg, #4ecdc4, #45b7af);
+}
+
+.delete-btn {
+    background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+}
+
+/* Responsividad */
+@media (max-width: 1200px) {
+    .admin-container {
+        padding: 1rem;
+    }
+    
+    td, th {
+        padding: 0.8rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-tabs {
+        flex-wrap: wrap;
+    }
+    
+    .action-btn {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.8rem;
+    }
+}

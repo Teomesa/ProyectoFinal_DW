@@ -32,6 +32,7 @@ class CharcosService {
                 </div>
             `;
         }
+        console.log('Respuesta de charcos:', this.charcos);
     }
 
     renderCharcos() {

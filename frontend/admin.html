@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - Charcos Antioquia</title>
+    <link rel="stylesheet" href="/css/mostrar-styles.css">
+    <link rel="stylesheet" href="/css/admin-styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            Charcos Antioquia - Panel de Administración
+        </div>
+        <div class="user-profile">
+            <div class="user-info">
+                <span id="user-name"></span>
+                <button id="back-btn" class="header-btn">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </button>
+                <button id="logout-btn" class="header-btn">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="admin-container">
+        <div class="admin-tabs">
+            <button class="tab-btn active" data-tab="users">Usuarios</button>
+            <button class="tab-btn" data-tab="charcos">Charcos</button>
+            <button class="tab-btn" data-tab="opinions">Opiniones</button>
+        </div>
+
+        <div class="tab-content active" id="users-tab">
+            <h2>Gestión de Usuarios</h2>
+            <div class="table-container">
+                <table id="users-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Edad</th>
+                            <th>Fecha de Creación</th>
+                            <th>Tipo Usuario</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Los usuarios se cargarán dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="charcos-tab">
+            <h2>Gestión de Charcos</h2>
+            <button class="btn btn-primary add-btn">
+                <i class="fas fa-plus"></i> Agregar Charco
+            </button>
+            <div class="table-container">
+                <table id="charcos-table">
+                    <!-- Contenido de charcos -->
+                </table>
+            </div>
+        </div>
+
+        <div class="tab-content" id="opinions-tab">
+            <h2>Gestión de Opiniones</h2>
+            <div class="table-container">
+                <table id="opinions-table">
+                    <!-- Contenido de opiniones -->
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script type="module" src="/js/admin/admin.js"></script>
+</body>
+</html>

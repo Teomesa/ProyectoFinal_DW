@@ -15,14 +15,20 @@
         </div>
 
         <div class="user-profile">
-            <button id="favorites-btn" class="btn btn-outline">
-                <i class="fas fa-heart"></i> Favoritos
-            </button>
             <div class="user-info">
-                <span id="user-name"></span>
-                <button id="logout-btn" class="btn btn-outline">
-                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-                </button>
+                <div class="user-info">
+                    <span id="user-name"></span>
+                    <!-- Botón de administración (oculto por defecto) -->
+                    <button id="admin-panel-btn" class="header-btn" style="display: none;">
+                        <i class="fas fa-cog"></i> Panel Admin
+                    </button>
+                    <button id="favorites-btn" class="header-btn">
+                        <i class="fas fa-heart"></i> Favoritos
+                    </button>
+                    <button id="logout-btn" class="header-btn">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </button>
+                </div>
             </div>
         </div>
     </header>
@@ -69,24 +75,17 @@
                 </div>
             </div>
         </aside>
-
-        <!-- Contenedor de charcos -->
         <div id="charcos-container" class="card-container">
-            <!-- Los charcos se cargarán dinámicamente aquí -->
+            <!-- Los charcos se cargarán aquí dinámicamente -->
         </div>
     </main>
-
-    <footer>
-        <p>Desarrollado por <strong>Mateo Restrepo</strong></p>
-        <p>Universidad de Antioquia</p>
-        <p>Medellín, 2024</p>
-    </footer>
 
     <!-- Scripts -->
     <script src="https://kit.fontawesome.com/your-fontawesome-kit.js"></script>
     <script type="module" src="js/services/authService.js"></script>
     <script type="module" src="js/charcos.js"></script>
-    
+    <script type="module" src="/js/userInterface.js"></script>
+
     <script type="module">
         import AuthService from './js/services/authService.js';
 
@@ -133,5 +132,10 @@
             });
         });
     </script>
+    <footer>
+        <p>Desarrollado por <strong>Mateo Restrepo</strong></p>
+        <p>Universidad de Antioquia</p>
+        <p>Medellín, 2024</p>
+    </footer>
 </body>
 </html>

@@ -6,6 +6,7 @@ require('dotenv').config();
 
 const authRoutes = require('./routes/auth');
 const charcosRoutes = require('./routes/charcos');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/charcos', charcosRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Configuración para servir archivos estáticos
 const frontendPath = path.join(__dirname, '../../frontend');
@@ -42,6 +44,11 @@ app.get('*', (req, res) => {
     }
     
     res.sendFile(indexPath);
+});
+
+// En app.js
+app.get('/admin.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '../../frontend/admin.html'));
 });
 
 const PORT = process.env.PORT || 3000;
