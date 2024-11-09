@@ -151,3 +151,216 @@ tr:hover {
         font-size: 0.8rem;
     }
 }
+/* Estilos para el modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.modal-content {
+    background: var(--dark);
+    margin: 20px auto;
+    padding: 0;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    position: relative;
+}
+
+.modal-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--glass-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h2 {
+    margin: 0;
+    color: var(--light);
+    font-size: 1.5rem;
+}
+
+.close {
+    color: var(--light);
+    font-size: 1.8rem;
+    cursor: pointer;
+    padding: 5px 10px;
+    transition: all 0.3s ease;
+}
+
+.close:hover {
+    color: var(--primary);
+}
+
+.charco-form {
+    padding: 20px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--light);
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--light);
+    font-size: 1rem;
+}
+
+.form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--glass-border);
+}
+
+
+
+/* Estilos para los selects */
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--light);
+    font-size: 1rem;
+    cursor: pointer;
+    appearance: auto; /* Permitir la apariencia nativa del select */
+}
+
+/* Estilos para las opciones del select */
+.form-group select option {
+    background-color: var(--dark);
+    color: var(--light);
+    padding: 10px;
+}
+
+/* Estilo para cuando el select está abierto */
+.form-group select:focus {
+    outline: none;
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 2px rgba(78, 205, 196, 0.2);
+}
+
+/* Estilos específicos para las opciones */
+option {
+    background: var(--dark);
+    color: white;
+    padding: 8px;
+}
+
+/* Asegurar que el texto del select sea visible */
+select:not(:checked) {
+    color: white;
+}
+
+/* Estilo para la opción seleccionada */
+select option:checked {
+    background: var(--secondary);
+    color: white;
+}
+
+/* Estilo para el hover en las opciones */
+select option:hover {
+    background: var(--secondary);
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn i {
+    font-size: 1.1rem;
+}
+
+.btn-primary {
+    background: var(--secondary);
+    color: white;
+}
+
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--light);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn-primary:hover {
+    background: #45b7af;
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-content {
+        margin: 10px;
+        width: calc(100% - 20px);
+    }
+
+    .form-actions {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}

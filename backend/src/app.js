@@ -14,30 +14,36 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// API Routes
+// Logging middleware para depuración
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path}`);
+    next();
+});
+
+// API Routes - Primero procesar las rutas de la API
 app.use('/api/auth', authRoutes);
 app.use('/api/charcos', charcosRoutes);
 app.use('/api/admin', adminRoutes);
 
 // Configuración para servir archivos estáticos
 const frontendPath = path.join(__dirname, '../../frontend');
-console.log('Ruta del frontend:', frontendPath);
-
-// Servir archivos estáticos desde el directorio frontend
 app.use(express.static(frontendPath));
 
-// Ruta para todas las peticiones que no sean API
+// Ruta admin.html específica
+app.get('/admin.html', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'admin.html'));
+});
+
+// MOVER ESTA RUTA AL FINAL - para que no intercepte las rutas de la API
 app.get('*', (req, res) => {
-    console.log('Ruta solicitada:', req.path);
+    console.log('Ruta no encontrada:', req.path);
     
     if (req.path.startsWith('/api')) {
         return res.status(404).json({ message: 'API endpoint not found' });
     }
 
     const indexPath = path.join(frontendPath, 'index.html');
-    console.log('Sirviendo index.html desde:', indexPath);
     
-    // Verificar si el archivo existe
     if (!require('fs').existsSync(indexPath)) {
         console.error('El archivo index.html no existe en:', indexPath);
         return res.status(404).send('Archivo no encontrado');
@@ -46,14 +52,7 @@ app.get('*', (req, res) => {
     res.sendFile(indexPath);
 });
 
-// En app.js
-app.get('/admin.html', (req, res) => {
-    res.sendFile(path.join(__dirname, '../../frontend/admin.html'));
-});
-
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor corriendo en puerto ${PORT}`);
-    console.log('Directorio de trabajo actual:', process.cwd());
-    console.log('Contenido del directorio frontend:', require('fs').readdirSync(frontendPath));
 });

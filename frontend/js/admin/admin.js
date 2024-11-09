@@ -4,10 +4,11 @@ class AdminPanel {
         this.init();
     }
 
-    init() {
-        this.checkAdminAuth();
+    async init() {  // Agregamos async aquí
+        await this.checkAdminAuth();
         this.setupEventListeners();
-        this.loadUsers(); // Cargar usuarios inmediatamente
+        await this.loadUsers();
+        await this.loadCharcos(); // Ahora podemos usar await aquí
     }
 
     async checkAdminAuth() {
@@ -26,23 +27,69 @@ class AdminPanel {
     setupEventListeners() {
         // Event listeners para las pestañas
         document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+            btn.addEventListener('click', async (e) => {  
                 const tab = e.target.dataset.tab;
                 this.switchTab(tab);
                 
                 // Cargar el contenido correspondiente
                 switch(tab) {
                     case 'users':
-                        this.loadUsers();
+                        await this.loadUsers();
                         break;
                     case 'charcos':
-                        // this.loadCharcos();
+                        await this.loadCharcos();
                         break;
                     case 'opinions':
                         // this.loadOpinions();
                         break;
                 }
             });
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                // Cerrar al hacer clic en la X
+                const closeButton = modal.querySelector('.close');
+                if (closeButton) {
+                    closeButton.addEventListener('click', () => {
+                        this.closeCharcoModal();
+                    });
+                }
+    
+            // Cerrar al hacer clic fuera del modal
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    this.closeCharcoModal();
+                }
+            });
+        });
+        // Event listener para el formulario de charcos
+            const charcoForm = document.getElementById('charco-form');
+            if (charcoForm) {
+                charcoForm.removeEventListener('submit', this.handleSubmit);
+                this.handleSubmit = async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation(); // Prevenir propagación del evento               
+                    const submitButton = charcoForm.querySelector('button[type="submit"]');
+                    if (submitButton) submitButton.disabled = true;
+                    
+                    try {
+                        const formData = new FormData(charcoForm);
+                        const charcoData = Object.fromEntries(formData);
+                        
+                        const charcoId = charcoForm.dataset.charcoId;
+                        if (charcoId) {
+                            await this.updateCharco(charcoId, charcoData);
+                        } else {
+                            await this.createCharco(charcoData);
+                        }
+                    } catch (error) {
+                        console.error('Error al procesar el formulario:', error);
+                    } finally {
+                        // Re-habilitar el botón
+                        if (submitButton) submitButton.disabled = false;
+                    }
+                };
+                charcoForm.addEventListener('submit', this.handleSubmit);
+            }
         });
 
         // Event listener para el botón de volver
@@ -250,6 +297,284 @@ class AdminPanel {
         } catch (error) {
             console.error('Error:', error);
             throw error;
+        }
+    }
+    // Métodos para gestión de charcos
+    async loadCharcos() {
+        try {
+            console.log('Iniciando carga de charcos en panel admin');
+            const token = localStorage.getItem('token');
+            
+            if (!token) {
+                console.error('No se encontró token');
+                return;
+            }
+
+            console.log('Token encontrado:', token);
+            
+            const response = await fetch('http://localhost:3000/api/admin/charcos', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            console.log('Respuesta recibida:', response.status);
+
+            if (!response.ok) {
+                const errorData = await response.text();
+                console.error('Error response:', errorData);
+                throw new Error(`Error al cargar charcos: ${response.status}`);
+            }
+
+            const charcos = await response.json();
+            console.log('Datos de charcos recibidos:', charcos);
+
+            this.renderCharcosTable(charcos);
+        } catch (error) {
+            console.error('Error completo:', error);
+            console.error('Error cargando charcos:', error.message);
+        }
+    }
+
+    renderCharcosTable(charcos) {
+        console.log('Renderizando tabla de charcos:', charcos);
+        const tbody = document.querySelector('#charcos-table tbody');
+        if (!tbody) {
+            console.error('No se encontró el tbody de la tabla de charcos');
+            return;
+        }
+
+        if (!charcos || charcos.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center">No hay charcos registrados</td>
+                </tr>
+            `;
+            return;
+        }
+
+        tbody.innerHTML = charcos.map(charco => `
+            <tr>
+                <td>${charco.id_charco}</td>
+                <td>${charco.nombre}</td>
+                <td>${charco.municipio_nombre || 'No especificado'}</td>
+                <td>${charco.clima || 'No especificado'}</td>
+                <td>${charco.costo === 0 ? 'Gratis' : `$${charco.costo.toLocaleString()}`}</td>
+                <td>${charco.calificacion || 'Sin calificación'}</td>
+                <td>
+                    <button class="action-btn edit-btn" onclick="adminPanel.editCharco(${charco.id_charco})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn delete-btn" onclick="adminPanel.deleteCharco(${charco.id_charco})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async createCharco(charcoData) {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch('/api/admin/charcos', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    nombre: charcoData.nombre,
+                    descripcion: charcoData.descripcion,
+                    municipio: charcoData.municipio,
+                    clima: charcoData.clima,
+                    profundidad: parseFloat(charcoData.profundidad),
+                    costo: parseFloat(charcoData.costo)
+                })
+            });
+    
+            const data = await response.json();
+    
+            if (!response.ok) {
+                throw new Error(data.message || 'Error al crear el charco');
+            }
+    
+            await this.loadCharcos();
+            this.closeCharcoModal();
+            alert('Charco creado exitosamente');
+            
+            // Limpiar el formulario
+            const form = document.getElementById('charco-form');
+            if (form) {
+                form.reset();
+                form.removeAttribute('data-charco-id');
+            }
+        } catch (error) {
+            console.error('Error al crear charco:', error);
+            alert(error.message || 'Error al crear el charco');
+        }
+    }
+
+    showAddCharcoModal() {
+        const modal = document.getElementById('charco-modal');
+        const form = document.getElementById('charco-form');
+        const title = document.getElementById('modal-title');
+        
+        // Limpiar el formulario
+        form.reset();
+        form.removeAttribute('data-charco-id');
+        title.textContent = 'Agregar Nuevo Charco';
+        
+        modal.style.display = 'block';
+    }
+
+    async editCharco(charcoId) {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/admin/charcos/${charcoId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+    
+            if (!response.ok) {
+                throw new Error('Error al cargar el charco');
+            }
+    
+            const charco = await response.json();
+            this.showEditCharcoModal(charco);
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al cargar el charco para editar');
+        }
+    }
+
+    showEditCharcoModal(charco) {
+        const modal = document.getElementById('charco-modal');
+        const form = document.getElementById('charco-form');
+        
+        if (!form) {
+            console.error('No se encontró el formulario');
+            return;
+        }
+        
+        document.getElementById('modal-title').textContent = 'Editar Charco';
+        
+        // Llenar el formulario con los datos del charco
+        const fields = {
+            'charco-nombre': charco.nombre,
+            'charco-municipio': charco.municipio_nombre,
+            'charco-descripcion': charco.descripcion,
+            'charco-clima': charco.clima,
+            'charco-profundidad': charco.profundidad,
+            'charco-costo': charco.costo
+        };
+    
+        // Llenar cada campo verificando que existe
+        for (const [id, value] of Object.entries(fields)) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.value = value;
+            }
+        }
+        
+        form.dataset.charcoId = charco.id_charco;
+        modal.style.display = 'block';
+    }
+
+    async saveCharco(formData) {
+        try {
+            const token = localStorage.getItem('token');
+            const charcoId = formData.get('charcoId');
+            const method = charcoId ? 'PUT' : 'POST';
+            const url = charcoId ? 
+                `/api/admin/charcos/${charcoId}` : 
+                '/api/admin/charcos';
+
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(Object.fromEntries(formData))
+            });
+
+            if (!response.ok) throw new Error('Error al guardar el charco');
+
+            this.closeCharcoModal();
+            this.loadCharcos();
+            alert(charcoId ? 'Charco actualizado exitosamente' : 'Charco agregado exitosamente');
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al guardar el charco');
+        }
+    }
+
+    async updateCharco(charcoId, charcoData) {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/admin/charcos/${charcoId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    nombre: charcoData.nombre,
+                    descripcion: charcoData.descripcion,
+                    municipio: charcoData.municipio,
+                    clima: charcoData.clima,
+                    profundidad: parseFloat(charcoData.profundidad),
+                    costo: parseFloat(charcoData.costo)
+                })
+            });
+    
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.message || 'Error al actualizar el charco');
+            }
+    
+            await this.loadCharcos();
+            this.closeCharcoModal();
+            alert('Charco actualizado exitosamente');
+        } catch (error) {
+            console.error('Error:', error);
+            alert(error.message || 'Error al actualizar el charco');
+        }
+    }
+
+    async deleteCharco(charcoId) {
+        try {
+            if (!confirm('¿Estás seguro de que quieres eliminar este charco?')) {
+                return;
+            }
+    
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/admin/charcos/${charcoId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+    
+            if (!response.ok) {
+                throw new Error('Error al eliminar el charco');
+            }
+    
+            await this.loadCharcos();
+            alert('Charco eliminado exitosamente');
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error al eliminar el charco');
+        }
+    }
+
+    closeCharcoModal() {
+        const modal = document.getElementById('charco-modal');
+        if (modal) {
+            modal.style.display = 'none';
         }
     }
 }
