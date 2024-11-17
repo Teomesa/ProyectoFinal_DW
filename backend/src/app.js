@@ -9,6 +9,17 @@ const charcosRoutes = require('./routes/charcos');
 const adminRoutes = require('./routes/admin');
 
 const app = express();
+const frontendPath = path.join(__dirname, '../../frontend');
+console.log('Frontend path:', frontendPath); // Para debugging
+
+// Asegurar que el directorio de uploads exista
+const uploadsDir = path.join(frontendPath, 'uploads/charcos');
+try {
+    require('fs').mkdirSync(uploadsDir, { recursive: true });
+    console.log('Directorio de uploads creado:', uploadsDir);
+} catch (error) {
+    console.error('Error creando directorio de uploads:', error);
+}
 
 // Middleware
 app.use(cors());
@@ -25,9 +36,17 @@ app.use('/api/auth', authRoutes);
 app.use('/api/charcos', charcosRoutes);
 app.use('/api/admin', adminRoutes);
 
-// Configuración para servir archivos estáticos
-const frontendPath = path.join(__dirname, '../../frontend');
 app.use(express.static(frontendPath));
+app.use('/uploads/charcos', express.static(uploadsDir));
+
+// Manejador de errores global
+app.use((err, req, res, next) => {
+    console.error('Error:', err);
+    res.status(500).json({
+        message: 'Error interno del servidor',
+        error: err.message
+    });
+});
 
 // Ruta admin.html específica
 app.get('/admin.html', (req, res) => {

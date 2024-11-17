@@ -14,12 +14,15 @@ const connectWithRetry = async (retries = 5, delay = 5000) => {
                 queueLimit: 0,
                 enableKeepAlive: true,
                 keepAliveInitialDelay: 0
-            }).promise();
+            });
+
+            // Convertir el pool a promesas
+            const promisePool = pool.promise();
 
             // Verificar la conexión
-            await pool.query('SELECT 1');
+            await promisePool.query('SELECT 1');
             console.log('Conexión a la base de datos establecida correctamente');
-            return pool;
+            return promisePool;
         } catch (err) {
             console.error(`Error conectando a la base de datos. Intentos restantes: ${retries-1}`);
             console.error(err);

@@ -2,6 +2,10 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
+const imageService = require('../services/imageService');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs').promises;
 const pool = require('../config/database');
 
 // Middleware para verificar si es administrador
@@ -199,28 +203,62 @@ router.get('/charcos/:id', async (req, res) => {
     }
 });
 
-router.post('/charcos', async (req, res) => {
+// Configuración de multer
+const storage = multer.diskStorage({
+    destination: async function (req, file, cb) {
+        const uploadDir = path.join(__dirname, '../../../frontend/uploads/charcos');
+        try {
+            await fs.mkdir(uploadDir, { recursive: true });
+            cb(null, uploadDir);
+        } catch (error) {
+            console.error('Error creando directorio:', error);
+            cb(error, null);
+        }
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, 'charco-' + uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({ storage: storage });
+
+const fileFilter = (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+    if (allowedTypes.includes(file.mimetype)) {
+        cb(null, true);
+    } else {
+        cb(new Error('Tipo de archivo no soportado. Solo se permiten JPG y PNG'), false);
+    }
+};
+
+// Ruta POST para crear charcos
+router.post('/charcos', upload.single('imagen'), async (req, res) => {
     try {
+        console.log('Recibida solicitud POST para crear charco');
+        console.log('Datos del formulario:', req.body);
+        console.log('Archivo:', req.file);
+
         const { nombre, descripcion, municipio, clima, profundidad, costo } = req.body;
         
         // Validar datos requeridos
         if (!nombre || !descripcion || !municipio || !clima) {
+            if (req.file) {
+                await fs.unlink(req.file.path).catch(console.error);
+            }
             return res.status(400).json({ 
                 message: 'Todos los campos son requeridos' 
             });
         }
 
-        // Buscar o crear el municipio
-        let [municipioResult] = await pool.query(
+        const [municipioResult] = await (await pool.getConnection()).query(
             'SELECT id_municipio FROM municipio WHERE nombre = ?',
             [municipio]
         );
         
         let municipioId;
-        
-        if (municipioResult.length === 0) {
-            // Si el municipio no existe, crearlo
-            const [insertResult] = await pool.query(
+        if (!municipioResult || municipioResult.length === 0) {
+            const [insertResult] = await (await pool.getConnection()).query(
                 'INSERT INTO municipio (nombre) VALUES (?)',
                 [municipio]
             );
@@ -230,40 +268,51 @@ router.post('/charcos', async (req, res) => {
         }
 
         // Crear el charco
-        const [result] = await pool.query(
+        const [charcoResult] = await (await pool.getConnection()).query(
             'INSERT INTO charco (nombre, descripcion, id_municipio, clima, profundidad, costo) VALUES (?, ?, ?, ?, ?, ?)',
-            [nombre, descripcion, municipioId, clima, profundidad, costo]
+            [nombre, descripcion, municipioId, clima, parseFloat(profundidad), parseFloat(costo)]
         );
 
+        // Si hay imagen, guardar en multimedia
+        if (req.file) {
+            const imageUrl = `/uploads/charcos/${req.file.filename}`;
+            await (await pool.getConnection()).query(
+                'INSERT INTO multimedia (id_charco, url, descripcion, principal) VALUES (?, ?, ?, TRUE)',
+                [charcoResult.insertId, imageUrl, 'Imagen principal del charco']
+            );
+        }
+
         res.status(201).json({ 
-            id: result.insertId, 
+            id: charcoResult.insertId, 
             message: 'Charco creado exitosamente' 
         });
+
     } catch (error) {
         console.error('Error al crear charco:', error);
+        if (req.file) {
+            await fs.unlink(req.file.path).catch(console.error);
+        }
         res.status(500).json({ 
             message: error.message || 'Error al crear el charco' 
         });
     }
 });
 
-// Ruta para actualizar un charco
-router.put('/charcos/:id', async (req, res) => {
+// Ruta PUT para actualizar charcos
+router.put('/charcos/:id', upload.single('imagen'), async (req, res) => {
     try {
         const { id } = req.params;
         const { nombre, descripcion, municipio, clima, profundidad, costo } = req.body;
 
-        // Primero, buscar o crear el municipio
-        let [municipioResult] = await pool.query(
+        // Buscar o crear el municipio
+        const [municipioResult] = await (await pool.getConnection()).query(
             'SELECT id_municipio FROM municipio WHERE nombre = ?',
             [municipio]
         );
         
         let municipioId;
-        
-        if (municipioResult.length === 0) {
-            // Si el municipio no existe, crearlo
-            const [insertResult] = await pool.query(
+        if (!municipioResult || municipioResult.length === 0) {
+            const [insertResult] = await (await pool.getConnection()).query(
                 'INSERT INTO municipio (nombre) VALUES (?)',
                 [municipio]
             );
@@ -272,8 +321,37 @@ router.put('/charcos/:id', async (req, res) => {
             municipioId = municipioResult[0].id_municipio;
         }
 
+        // Si hay una nueva imagen
+        if (req.file) {
+            const [oldImage] = await (await pool.getConnection()).query(
+                'SELECT url FROM multimedia WHERE id_charco = ? AND principal = TRUE',
+                [id]
+            );
+
+            if (oldImage.length > 0) {
+                // Eliminar el archivo anterior
+                const oldFilename = oldImage[0].url.split('/').pop();
+                await fs.unlink(path.join(__dirname, '../../../frontend/uploads/charcos', oldFilename))
+                    .catch(console.error);
+                
+                // Actualizar el registro en la base de datos
+                const imageUrl = `/uploads/charcos/${req.file.filename}`;
+                await (await pool.getConnection()).query(
+                    'UPDATE multimedia SET url = ? WHERE id_charco = ? AND principal = TRUE',
+                    [imageUrl, id]
+                );
+            } else {
+                // Crear nuevo registro de imagen
+                const imageUrl = `/uploads/charcos/${req.file.filename}`;
+                await (await pool.getConnection()).query(
+                    'INSERT INTO multimedia (id_charco, url, descripcion, principal) VALUES (?, ?, ?, TRUE)',
+                    [id, imageUrl, 'Imagen principal del charco']
+                );
+            }
+        }
+
         // Actualizar el charco
-        await pool.query(
+        await (await pool.getConnection()).query(
             'UPDATE charco SET nombre = ?, descripcion = ?, id_municipio = ?, clima = ?, profundidad = ?, costo = ? WHERE id_charco = ?',
             [nombre, descripcion, municipioId, clima, profundidad, costo, id]
         );
@@ -281,17 +359,47 @@ router.put('/charcos/:id', async (req, res) => {
         res.json({ message: 'Charco actualizado exitosamente' });
     } catch (error) {
         console.error('Error al actualizar charco:', error);
+        if (req.file) {
+            await fs.unlink(req.file.path).catch(console.error);
+        }
         res.status(500).json({ message: error.message });
     }
 });
 
-router.delete('/charcos/:id', async (req, res) => {
+// Actualizar la ruta DELETE para eliminar charcos
+router.delete('/charcos/:id', auth, async (req, res) => {
+    const connection = await pool.getConnection();
     try {
         const { id } = req.params;
-        await pool.query('DELETE FROM charco WHERE id_charco = ?', [id]);
+        
+        await connection.beginTransaction();
+
+        // Obtener y eliminar las imágenes asociadas
+        const [images] = await connection.query(
+            'SELECT url FROM multimedia WHERE id_charco = ?',
+            [id]
+        );
+
+        // Eliminar archivos físicos
+        for (const image of images) {
+            const filename = image.url.split('/').pop();
+            await imageService.deleteImage(filename);
+        }
+
+        // Eliminar registros de multimedia
+        await connection.query('DELETE FROM multimedia WHERE id_charco = ?', [id]);
+
+        // Eliminar el charco
+        await connection.query('DELETE FROM charco WHERE id_charco = ?', [id]);
+
+        await connection.commit();
         res.json({ message: 'Charco eliminado exitosamente' });
     } catch (error) {
+        await connection.rollback();
+        console.error('Error:', error);
         res.status(500).json({ message: error.message });
+    } finally {
+        connection.release();
     }
 });
 

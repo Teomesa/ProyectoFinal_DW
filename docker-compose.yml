@@ -15,6 +15,7 @@ services:
         source: ./frontend
         target: /usr/src/app/frontend
       - /usr/src/app/backend/node_modules
+      - charcos_uploads:/usr/src/app/frontend/uploads/charcos
     working_dir: /usr/src/app/backend
     environment:
       - NODE_ENV=development
@@ -27,9 +28,10 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    networks:
-      - app-network
     restart: unless-stopped
+    networks:
+      - proyecto_final_network
+    command: sh -c "npm install wait-port && npx wait-port db:3306 && npm start"
 
   db:
     image: mysql:8.0
@@ -56,7 +58,7 @@ services:
       retries: 10
       start_period: 30s
     networks:
-      - app-network
+      - proyecto_final_network
     restart: unless-stopped
 
   adminer:
@@ -66,13 +68,15 @@ services:
     depends_on:
       - db
     networks:
-      - app-network
+      - proyecto_final_network
     restart: unless-stopped
 
 networks:
-  app-network:
+  proyecto_final_network:
     driver: bridge
 
 volumes:
   mysql_data:
     name: charcos_mysql_data
+  charcos_uploads:
+    name: charcos_uploads_data
