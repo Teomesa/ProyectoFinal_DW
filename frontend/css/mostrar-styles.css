@@ -93,7 +93,24 @@ header {
 }
 
 /* Botones mejorados */
-.header-btn {
+.header-btn,
+[data-action="favoritos"] {
+    background: rgba(255, 107, 107, 0.9); /* Color base rojo claro */
+    color: white;
+    border: none;
+    padding: 0.7rem 1.2rem;
+    border-radius: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 10px rgba(255, 107, 107, 0.2);
+}
+
+.nav-buttons {
     background: var(--glass-bg);
     color: white;
     border: 1px solid var(--glass-border);
@@ -108,39 +125,63 @@ header {
     font-size: 0.9rem;
 }
 
-.header-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+.header-btn,
+[data-action="favoritos"] {
+    background: red;
+    color: white;
+    border: 1px solid var(--glass-border);
+    padding: 0.7rem 1.2rem;
+    border-radius: 50px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 0.9rem;
 }
 
-.header-btn i {
+.header-btn:hover,
+[data-action="favoritos"]:hover {
+    background: rgb(255, 87, 87);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+}
+.header-btn i,
+[data-action="favoritos"] i {
     font-size: 1rem;
 }
 
-/* Botón de favoritos */
-#favorites-btn {
-    background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
-    border: none;
+[data-action="favoritos"] {
+    background: var(--glass-bg);
+    border-color: var(--glass-border);
 }
 
-#favorites-btn:hover {
-    background: linear-gradient(45deg, #ff8e8e, #ff6b6b);
+[data-action="favoritos"]:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Animación para el ícono de favoritos cuando está activo */
+[data-action="favoritos"].active i {
+    animation: heartbeat 1.5s ease infinite;
+}
+
+[data-action="favoritos"].active {
+    background: var(--primary);
+    border-color: var(--primary);
+    box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
 }
 
 /* Botón de cerrar sesión */
 #logout-btn {
     background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    border: 1px solid var(--glass-border);
 }
 
 #logout-btn:hover {
     background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.3);
-}
-
-/* Efecto de hover para los botones */
-.header-btn:hover i {
-    animation: pulseIcon 1s infinite;
+    transform: translateY(-2px);
 }
 
 @keyframes pulseIcon {
@@ -290,12 +331,6 @@ header {
 
 .filter-group h3 i {
     color: var(--secondary);
-}
-
-.filter-options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
 }
 
 .filter-option {
@@ -575,23 +610,6 @@ footer strong {
     color: rgba(255, 255, 255, 0.7);
 }
 
-.favorite-btn {
-    width: 100%;
-    margin-top: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-
-.favorite-btn i {
-    color: var(--primary);
-}
-
-.favorite-btn:hover i {
-    color: white;
-}
-
 .search-bar input {
     background: transparent;
     border: none;
@@ -799,11 +817,6 @@ footer strong {
     color: #ffe66d;
 }
 
-.opinion-content {
-    margin: 10px 0;
-    line-height: 1.5;
-}
-
 .opinion-image {
     max-width: 100%;
     border-radius: 8px;
@@ -974,14 +987,19 @@ tr:hover {
 }
 
 .opinion-rating {
-    display: flex;
-    align-items: center;
-    gap: 5px;
+    text-align: center;
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
 }
 
 .opinion-content {
-    margin: 15px 0;
-    line-height: 1.5;
+    text-align: center;
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
 }
 
 .opinion-image {
@@ -1021,4 +1039,256 @@ tr:hover {
     border-radius: 8px;
     margin: 10px 0;
     text-align: center;
+}
+
+/* Agregar a tu archivo CSS */
+
+.favorite-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    border: none;
+    padding: 8px 20px;
+    border-radius: 30px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9em;
+    font-weight: 500;
+    color: #2d3436;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    transform: translateY(0);
+}
+
+.favorite-btn:hover {
+    background: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.favorite-btn i {
+    color: #ff6b6b;
+    font-size: 1.1em;
+    transition: all 0.3s ease;
+}
+
+.favorite-btn.is-favorite {
+    background: var(--primary);
+    color: white;
+}
+
+.favorite-btn.is-favorite i {
+    color: white;
+}
+
+.filter-option {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--light);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9em;
+}
+
+.filter-option:hover,
+.filter-option.active {
+    background: var(--secondary);
+    border-color: var(--secondary);
+    transform: translateY(-2px);
+}
+
+.filter-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0;
+}
+
+.filter-option {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    color: var(--light);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9em;
+}
+
+.filter-option:hover,
+.filter-option.active {
+    background: var(--secondary);
+    border-color: var(--secondary);
+    transform: translateY(-2px);
+}
+
+/* Animaciones para transiciones */
+@keyframes slideOutLeft {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Header de favoritos */
+.favorites-header {
+    background: linear-gradient(135deg, var(--primary) 0%, #ff8e8e 100%);
+    padding: 40px 20px;
+    margin-bottom: 30px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    animation: slideInDown 0.5s ease;
+    box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
+}
+
+.favorites-content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.favorites-header i {
+    font-size: 3em;
+    color: white;
+    margin-bottom: 15px;
+    animation: pulse 2s infinite;
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.favorites-header h2 {
+    color: white;
+    font-size: 2.5em;
+    margin: 0 0 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.favorites-count {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.2em;
+    margin: 0;
+    font-weight: 500;
+}
+
+/* Ajustes para el contenedor principal en vista de favoritos */
+.main-container {
+    transition: all 0.3s ease;
+}
+
+/* Estilos para el grid de charcos en vista de favoritos */
+.card-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+    padding: 0 20px;
+}
+
+/* Animaciones */
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes slideInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mensaje cuando no hay favoritos */
+.no-favorites {
+    text-align: center;
+    padding: 60px 20px;
+    background: var(--glass-bg);
+    border-radius: 20px;
+    margin: 20px auto;
+    max-width: 600px;
+    border: 1px solid var(--glass-border);
+    animation: fadeIn 0.5s ease;
+}
+
+.no-favorites i {
+    font-size: 4em;
+    color: var(--primary);
+    margin-bottom: 20px;
+    animation: bounce 2s infinite;
+}
+
+.no-favorites h3 {
+    color: var(--light);
+    font-size: 1.8em;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.no-favorites p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1em;
+    max-width: 400px;
+    margin: 0 auto;
+    line-height: 1.5;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
 }

@@ -47,7 +47,7 @@ class FiltersService {
     async applyFilters() {
         try {
             // Obtener todos los charcos
-            let charcos = await fetchAPI('/charcos');
+            let charcos = await fetchAPI('/');
 
             // Aplicar filtros
             charcos = charcos.filter(charco => {

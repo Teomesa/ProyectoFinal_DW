@@ -22,12 +22,14 @@
                     <button id="admin-panel-btn" class="header-btn" style="display: none;">
                         <i class="fas fa-cog"></i> Panel Admin
                     </button>
-                    <button id="favorites-btn" class="header-btn">
-                        <i class="fas fa-heart"></i> Favoritos
-                    </button>
-                    <button id="logout-btn" class="header-btn">
-                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-                    </button>
+                    <div class="nav-buttons">
+                        <button data-action="favoritos" class="header-btn_favoritos-btn">
+                            <i class="fas fa-heart"></i> Favoritos
+                        </button>
+                        <button id="logout-btn" class="header-btn">
+                            <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -50,31 +52,28 @@
         <aside class="filter-section">
             <div class="filter-group">
                 <h3>Clima</h3>
-                <div class="filter-options">
-                    <span class="filter-option active">Todos</span>
-                    <span class="filter-option">Cálido</span>
-                    <span class="filter-option">Templado</span>
-                    <span class="filter-option">Frío</span>
+                <div class="filter-options" data-filter-type="clima">
+                    <button class="filter-option active" data-value="todos">Todos</button>
+                    <button class="filter-option" data-value="Cálido">Cálido</button>
+                    <button class="filter-option" data-value="Templado">Templado</button>
+                    <button class="filter-option" data-value="Frío">Frío</button>
                 </div>
             </div>
 
             <div class="filter-group">
-                <h3>Municipio</h3>
-                <div class="filter-options">
-                    <span class="filter-option active">Todos</span>
-                    <span class="filter-option">San Luis</span>
-                    <span class="filter-option">San Rafael</span>
-                    <span class="filter-option">Cisneros</span>
+                <h3><i class="fas fa-map-marker-alt"></i> Municipio</h3>
+                <div class="filter-options" data-filter-type="municipio">
+                    <!-- Se llena dinámicamente -->
                 </div>
             </div>
 
             <div class="filter-group">
-                <h3>Calificación</h3>
-                <div class="filter-options">
-                    <span class="filter-option active">Todos</span>
-                    <span class="filter-option">9 y arriba</span>
-                    <span class="filter-option">7 a 9</span>
-                    <span class="filter-option">Menos de 7</span>
+                <h3><i class="fas fa-star"></i> Calificación</h3>
+                <div class="filter-options" data-filter-type="calificacion">
+                    <button class="filter-option active" data-value="todos">Todos</button>
+                    <button class="filter-option" data-value="9+">9 y arriba</button>
+                    <button class="filter-option" data-value="7-9">7 a 9</button>
+                    <button class="filter-option" data-value="-7">Menos de 7</button>
                 </div>
             </div>
         </aside>

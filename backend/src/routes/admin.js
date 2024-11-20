@@ -162,20 +162,20 @@ router.delete('/users/:id', async (req, res) => {
 // Rutas para gestión de charcos
 router.get('/charcos', async (req, res) => {
     try {
-        console.log('Accediendo a la ruta GET /charcos en admin');
         const [charcos] = await pool.query(`
             SELECT 
                 c.*,
-                m.nombre as municipio_nombre
+                m.nombre as municipio_nombre,
+                m.ubicacion as municipio_ubicacion,
+                mm.url as imagen_principal
             FROM charco c
             LEFT JOIN municipio m ON c.id_municipio = m.id_municipio
-            ORDER BY c.id_charco DESC
+            LEFT JOIN multimedia mm ON c.id_charco = mm.id_charco AND mm.principal = TRUE
         `);
         
-        console.log('Charcos encontrados:', { count: charcos.length });
         res.json(charcos);
     } catch (error) {
-        console.error('Error en la consulta:', error);
+        console.error('Error:', error);
         res.status(500).json({ message: 'Error al obtener los charcos' });
     }
 });
@@ -231,6 +231,74 @@ const fileFilter = (req, file, cb) => {
         cb(new Error('Tipo de archivo no soportado. Solo se permiten JPG y PNG'), false);
     }
 };
+
+// Rutas de favoritos
+router.get('/favorites', auth, async (req, res) => {
+    try {
+        const userId = req.user.id_usuario;
+        const [favorites] = await pool.query(`
+            SELECT 
+                c.*,
+                m.nombre as municipio_nombre,
+                mm.url as imagen_principal,
+                f.fecha_marcado
+            FROM favorito f
+            JOIN charco c ON f.id_charco = c.id_charco
+            LEFT JOIN municipio m ON c.id_municipio = m.id_municipio
+            LEFT JOIN multimedia mm ON c.id_charco = mm.id_charco AND mm.principal = TRUE
+            WHERE f.id_usuario = ?
+            ORDER BY f.fecha_marcado DESC
+        `, [userId]);
+        
+        res.json(favorites);
+    } catch (error) {
+        console.error('Error al obtener favoritos:', error);
+        res.status(500).json({ message: 'Error al obtener los favoritos' });
+    }
+});
+
+router.post('/favorites/:charcoId', auth, async (req, res) => {
+    try {
+        const userId = req.user.id_usuario;
+        const charcoId = req.params.charcoId;
+
+        const [existing] = await pool.query(
+            'SELECT * FROM favorito WHERE id_usuario = ? AND id_charco = ?',
+            [userId, charcoId]
+        );
+
+        if (existing.length > 0) {
+            return res.status(400).json({ message: 'El charco ya está en favoritos' });
+        }
+
+        await pool.query(
+            'INSERT INTO favorito (id_usuario, id_charco) VALUES (?, ?)',
+            [userId, charcoId]
+        );
+
+        res.json({ message: 'Charco agregado a favoritos' });
+    } catch (error) {
+        console.error('Error al agregar a favoritos:', error);
+        res.status(500).json({ message: 'Error al agregar a favoritos' });
+    }
+});
+
+router.delete('/favorites/:charcoId', auth, async (req, res) => {
+    try {
+        const userId = req.user.id_usuario;
+        const charcoId = req.params.charcoId;
+
+        await pool.query(
+            'DELETE FROM favorito WHERE id_usuario = ? AND id_charco = ?',
+            [userId, charcoId]
+        );
+
+        res.json({ message: 'Charco eliminado de favoritos' });
+    } catch (error) {
+        console.error('Error al eliminar de favoritos:', error);
+        res.status(500).json({ message: 'Error al eliminar de favoritos' });
+    }
+});
 
 // Ruta POST para crear charcos
 router.post('/charcos', upload.single('imagen'), async (req, res) => {

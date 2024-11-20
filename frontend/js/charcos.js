@@ -6,12 +6,28 @@ class CharcosService {
             clima: 'todos',
             municipio: 'todos'
         };
-        this.init();
+        // Vincular los métodos que usan 'this'
+        this.toggleFavorite = this.toggleFavorite.bind(this);
+        this.updateFavoriteButton = this.updateFavoriteButton.bind(this);
+        this.updateFavoriteButtons = this.updateFavoriteButtons.bind(this);
+        this.renderCharcos = this.renderCharcos.bind(this);
+        this.isFavoritesView = false; 
+        // Iniciar la carga de datos
+        this.initialize();
     }
 
-    async init() {
-        await this.loadCharcos();
-        this.setupEventListeners();
+    async initialize() {
+        try {
+            // Primero cargar favoritos
+            await this.loadFavorites();
+            // Luego cargar charcos
+            await this.loadCharcos();
+            // Finalmente configurar los event listeners y filtros
+            this.setupEventListeners();
+            this.setupFilters();
+        } catch (error) {
+            console.error('Error en la inicialización:', error);
+        }
     }
 
     setupEventListeners() {
@@ -69,6 +85,19 @@ class CharcosService {
                 modal.style.display = 'none';
             }
         });
+
+        // Agregar listener para el botón de favoritos en el header
+        const favoritosBtn = document.querySelector('[data-action="favoritos"]');
+    
+        if (favoritosBtn) {
+            console.log('Botón de favoritos encontrado');
+            favoritosBtn.addEventListener('click', () => {
+                console.log('Clic en favoritos');
+                this.toggleFavoritesView();
+            });
+        } else {
+            console.error('No se encontró el botón de favoritos');
+        }
     }
     
     async handleOpinionSubmit(e) {
@@ -202,23 +231,107 @@ class CharcosService {
         });
     }
 
+    setupFilters() {
+        // Configurar todos los grupos de filtros
+        const filterGroups = document.querySelectorAll('.filter-group');
+        filterGroups.forEach(group => {
+            const filterOptions = group.querySelector('.filter-options');
+            if (filterOptions) {
+                const filterType = filterOptions.dataset.filterType;
+                filterOptions.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('filter-option')) {
+                        this.handleFilterClick(e.target, filterType);
+                    }
+                });
+            }
+        });
+
+        // Actualizar los filtros dinámicos
+        this.updateMunicipiosFilter();
+    }
+
+
+    async updateMunicipiosFilter() {
+        try {
+            if (!this.charcos || !this.charcos.length) return;
+
+            // Obtener municipios únicos y ordenarlos
+            const municipios = [...new Set(this.charcos
+                .map(c => c.municipio_nombre)
+                .filter(Boolean)
+                .sort())];
+
+            const municipioOptions = document.querySelector('.filter-options[data-filter-type="municipio"]');
+            if (municipioOptions) {
+                municipioOptions.innerHTML = `
+                    <button class="filter-option active" data-value="todos">Todos</button>
+                    ${municipios.map(m => `
+                        <button class="filter-option" data-value="${m}">${m}</button>
+                    `).join('')}
+                `;
+            }
+        } catch (error) {
+            console.error('Error actualizando filtros de municipios:', error);
+        }
+    }
+
+    handleFilterClick(buttonElement, filterType) {
+        // Encontrar el contenedor de filtros correcto
+        const filterGroup = buttonElement.closest('.filter-options');
+        
+        // Remover clase active de todos los botones en este grupo
+        filterGroup.querySelectorAll('.filter-option').forEach(btn => {
+            btn.classList.remove('active');
+        });
+
+        // Activar el botón seleccionado
+        buttonElement.classList.add('active');
+        
+        // Actualizar el valor del filtro
+        const filterValue = buttonElement.dataset.value;
+        this.filtros[filterType] = filterValue;
+        
+        console.log(`Filtro ${filterType} actualizado a:`, filterValue);
+        this.applyFilters();
+    }
+
+
     applyFilters() {
+        console.log('Aplicando filtros:', this.filtros);
         let filteredCharcos = [...this.charcos];
 
         // Filtrar por clima
         if (this.filtros.clima !== 'todos') {
             filteredCharcos = filteredCharcos.filter(charco => 
-                charco.clima?.toLowerCase() === this.filtros.clima
+                charco.clima?.toLowerCase() === this.filtros.clima.toLowerCase()
             );
         }
 
         // Filtrar por municipio
         if (this.filtros.municipio !== 'todos') {
             filteredCharcos = filteredCharcos.filter(charco => 
-                charco.municipio_nombre?.toLowerCase() === this.filtros.municipio
+                charco.municipio_nombre?.toLowerCase() === this.filtros.municipio.toLowerCase()
             );
         }
 
+        // Filtrar por calificación
+        if (this.filtros.calificacion !== 'todos') {
+            filteredCharcos = filteredCharcos.filter(charco => {
+                const rating = Number(charco.calificacion);
+                switch(this.filtros.calificacion) {
+                    case '9+':
+                        return rating >= 9;
+                    case '7-9':
+                        return rating >= 7 && rating < 9;
+                    case '-7':
+                        return rating < 7;
+                    default:
+                        return true;
+                }
+            });
+        }
+
+        console.log('Charcos filtrados:', filteredCharcos.length);
         this.renderCharcos(filteredCharcos);
     }
 
@@ -259,17 +372,35 @@ class CharcosService {
                 window.location.href = '/';
                 return;
             }
-
+    
+            // Si estamos en vista de favoritos, cargar solo favoritos
+            if (this.isFavoritesView) {
+                const response = await fetch('http://localhost:3000/api/charcos/favorites', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+    
+                if (!response.ok) {
+                    throw new Error('Error al cargar favoritos');
+                }
+    
+                const favorites = await response.json();
+                this.renderCharcos(favorites);
+                return;
+            }
+    
+            // Si no, cargar todos los charcos (comportamiento normal)
             const response = await fetch('http://localhost:3000/api/charcos', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
-
+    
             if (!response.ok) {
                 throw new Error('Error al cargar los charcos');
             }
-
+    
             this.charcos = await response.json();
             this.renderCharcos(this.charcos);
         } catch (error) {
@@ -306,9 +437,15 @@ class CharcosService {
     renderCharcos(charcosToRender) {
         const container = document.getElementById('charcos-container');
         if (!container) return;
-
+    
         if (!charcosToRender || charcosToRender.length === 0) {
-            container.innerHTML = `
+            container.innerHTML = this.isFavoritesView ? `
+                <div class="no-favorites">
+                    <i class="fas fa-heart"></i>
+                    <h3>No tienes charcos favoritos</h3>
+                    <p>Guarda tus charcos favoritos para acceder rápidamente a ellos cuando quieras</p>
+                </div>
+            ` : `
                 <div class="no-results">
                     <i class="fas fa-search"></i>
                     <h3>No se encontraron charcos</h3>
@@ -317,25 +454,30 @@ class CharcosService {
             `;
             return;
         }
-
+    
         container.innerHTML = charcosToRender.map(charco => {
-            // Crear las estrellas para la calificación promedio
             const rating = Math.round(charco.calificacion) || 0;
-            const filledStars = Array(rating).fill('★').join('');
-            const emptyStars = Array(10 - rating).fill('☆').join('');
-
-            return`
-            <div class="card" data-charco-id="${charco.id_charco}">
-                <img src="${charco.imagen_principal || '/placeholder.jpg'}" alt="${charco.nombre}">
-                <div class="card-content">
-                    <h2>${charco.nombre}</h2>
-                    <div class="location">
-                        <i class="fas fa-map-marker-alt"></i>
-                        ${charco.municipio_nombre}
-                    </div>
-                    <div class="card-description">
-                        ${charco.descripcion}
-                    </div>
+            const filledStars = '★'.repeat(rating);
+            const emptyStars = '☆'.repeat(10 - rating);
+            const isFavorite = this.favorites && this.favorites.has(Number(charco.id_charco));
+    
+            return `
+                <div class="card" data-charco-id="${charco.id_charco}">
+                    <img src="${charco.imagen_principal || '/placeholder.jpg'}" alt="${charco.nombre}">
+                    <button class="favorite-btn ${isFavorite ? 'is-favorite' : ''}" 
+                            data-charco-id="${charco.id_charco}">
+                        <i class="fas fa-heart${isFavorite ? '' : '-o'}"></i>
+                        ${isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+                    </button>
+                    <div class="card-content">
+                        <h2>${charco.nombre}</h2>
+                        <div class="location">
+                            <i class="fas fa-map-marker-alt"></i>
+                            ${charco.municipio_nombre || 'Sin ubicación'}
+                        </div>
+                        <div class="card-description">
+                            ${charco.descripcion || 'Sin descripción'}
+                        </div>
                         <div class="rating">
                             <div class="stars-display">
                                 <span class="stars-filled">${filledStars}</span>
@@ -345,21 +487,35 @@ class CharcosService {
                                 ${rating ? `${rating}/10` : 'Sin calificaciones'}
                             </div>
                         </div>
+                    </div>
+                    <div class="card-hover-info">
+                        <p><i class="fas fa-thermometer-half"></i> Clima: ${charco.clima || 'No especificado'}</p>
+                        <p><i class="fas fa-water"></i> Profundidad: ${charco.profundidad || 0} metros</p>
+                        <p><i class="fas fa-dollar-sign"></i> Costo: ${charco.costo === 0 ? 'Gratis' : `$${charco.costo.toLocaleString()}`}</p>
+                    </div>
                 </div>
-                <div class="card-hover-info">
-                    <p><i class="fas fa-thermometer-half"></i> Clima: ${charco.clima || 'No especificado'}</p>
-                    <p><i class="fas fa-water"></i> Profundidad: ${charco.profundidad} metros</p>
-                    <p><i class="fas fa-dollar-sign"></i> Costo: ${charco.costo === 0 ? 'Gratis' : `$${charco.costo.toLocaleString()}`}</p>
-                </div>
-            </div>
-        `}).join('');
-
-        // Agregar event listeners para los clicks en las tarjetas
+            `;
+        }).join('');
+    
+        // Agregar event listeners para los botones de favoritos
+        container.querySelectorAll('.favorite-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const charcoId = btn.dataset.charcoId;
+                this.toggleFavorite(charcoId, e);
+            });
+        });
+    
+        // Agregar event listeners para las tarjetas
         container.querySelectorAll('.card').forEach(card => {
-            card.addEventListener('click', () => {
-                const charcoId = card.dataset.charcoId;
-                const charcoName = card.querySelector('h2').textContent;
-                this.openOpinionModal(charcoId, charcoName);
+            card.addEventListener('click', (e) => {
+                // Solo abrir el modal si NO se hizo clic en el botón de favoritos
+                if (!e.target.closest('.favorite-btn')) {
+                    const charcoId = card.dataset.charcoId;
+                    const charcoName = card.querySelector('h2').textContent;
+                    this.openOpinionModal(charcoId, charcoName);
+                }
             });
         });
     }
@@ -379,6 +535,198 @@ class CharcosService {
 
         // Cargar opiniones existentes
         await this.loadOpinions(charcoId);
+    }
+
+    async loadFavorites() {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                console.log('No hay token para cargar favoritos');
+                return;
+            }
+
+            const response = await fetch('http://localhost:3000/api/charcos/favorites', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al cargar favoritos');
+            }
+            
+            const favorites = await response.json();
+            this.favorites = new Set(favorites.map(f => f.id_charco));
+            this.updateFavoriteButtons();
+        } catch (error) {
+            console.error('Error cargando favoritos:', error);
+        }
+    }
+
+    async toggleFavoritesView() {
+        try {
+            const favoritosBtn = document.querySelector('[data-action="favoritos"]');
+            // Seleccionar todos los elementos de filtro y búsqueda
+            const filterSection = document.querySelector('.filter-section');
+            const searchSection = document.querySelector('.search-section');
+            this.isFavoritesView = !this.isFavoritesView;
+    
+            if (this.isFavoritesView) {
+                // Activar botón
+                favoritosBtn?.classList.add('active');
+                
+                // Ocultar sección de filtros y búsqueda
+                if (filterSection) {
+                    filterSection.style.animation = 'slideOutLeft 0.3s ease forwards';
+                    setTimeout(() => {
+                        filterSection.style.display = 'none';
+                    }, 300);
+                }
+                
+                if (searchSection) {
+                    searchSection.style.animation = 'fadeOut 0.3s ease forwards';
+                    setTimeout(() => {
+                        searchSection.style.display = 'none';
+                    }, 300);
+                }
+    
+                // Ajustar el contenedor principal para ocupar todo el ancho
+                const mainContainer = document.querySelector('.main-container');
+                if (mainContainer) {
+                    mainContainer.style.display = 'block';
+                }
+    
+                const token = localStorage.getItem('token');
+                const response = await fetch('http://localhost:3000/api/charcos/favorites', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+    
+                if (!response.ok) {
+                    throw new Error('Error al cargar favoritos');
+                }
+    
+                const favoritedCharcos = await response.json();
+                
+                // Remover header anterior si existe
+                document.querySelector('.favorites-header')?.remove();
+                
+                // Agregar nuevo header
+                const mainContent = document.querySelector('.main-container');
+                if (mainContent) {
+                    mainContent.insertAdjacentHTML('beforebegin', `
+                        <div class="favorites-header">
+                            <div class="favorites-content">
+                                <i class="fas fa-heart"></i>
+                                <h2>Mis Charcos Favoritos</h2>
+                                <p class="favorites-count">
+                                    ${favoritedCharcos.length} 
+                                    ${favoritedCharcos.length === 1 ? 'charco guardado' : 'charcos guardados'}
+                                </p>
+                            </div>
+                        </div>
+                    `);
+                }
+    
+                this.renderCharcos(favoritedCharcos);
+            } else {
+                // Desactivar botón
+                favoritosBtn?.classList.remove('active');
+                
+                // Mostrar sección de filtros y búsqueda
+                if (filterSection) {
+                    filterSection.style.display = '';
+                    filterSection.style.animation = 'slideInLeft 0.3s ease forwards';
+                }
+                
+                if (searchSection) {
+                    searchSection.style.display = '';
+                    searchSection.style.animation = 'fadeIn 0.3s ease forwards';
+                }
+    
+                // Restaurar layout del contenedor principal
+                const mainContainer = document.querySelector('.main-container');
+                if (mainContainer) {
+                    mainContainer.style.display = 'flex';
+                }
+    
+                // Remover header de favoritos
+                const favoritesHeader = document.querySelector('.favorites-header');
+                if (favoritesHeader) {
+                    favoritesHeader.style.animation = 'slideOutUp 0.3s ease forwards';
+                    setTimeout(() => {
+                        favoritesHeader.remove();
+                    }, 300);
+                }
+    
+                await this.loadCharcos();
+            }
+        } catch (error) {
+            console.error('Error al cambiar la vista de favoritos:', error);
+            alert('Error al cargar los favoritos');
+        }
+    }
+
+    async toggleFavorite(charcoId, event) {
+        try {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+    
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Debes iniciar sesión para guardar favoritos');
+                return;
+            }
+    
+            const isFavorite = this.favorites.has(Number(charcoId));
+            const method = isFavorite ? 'DELETE' : 'POST';
+            
+            const response = await fetch(`http://localhost:3000/api/charcos/favorites/${charcoId}`, {
+                method: method,
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+    
+            if (!response.ok) {
+                throw new Error('Error al actualizar favorito');
+            }
+    
+            if (isFavorite) {
+                this.favorites.delete(Number(charcoId));
+            } else {
+                this.favorites.add(Number(charcoId));
+            }
+    
+            this.updateFavoriteButton(charcoId);
+            
+        } catch (error) {
+            console.error('Error al modificar favorito:', error);
+            alert('Error al actualizar favoritos');
+        }
+    }
+
+    updateFavoriteButtons() {
+        document.querySelectorAll('.favorite-btn').forEach(btn => {
+            const charcoId = Number(btn.dataset.charcoId);
+            this.updateFavoriteButton(charcoId);
+        });
+    }
+
+    updateFavoriteButton(charcoId) {
+        const btn = document.querySelector(`.favorite-btn[data-charco-id="${charcoId}"]`);
+        if (btn) {
+            const isFavorite = this.favorites.has(Number(charcoId));
+            btn.innerHTML = `
+                <i class="fas fa-heart${isFavorite ? '' : '-o'}"></i>
+                ${isFavorite ? 'Quitar de favoritos' : 'Agregar a favoritos'}
+            `;
+            btn.classList.toggle('is-favorite', isFavorite);
+        }
     }
 }
 
