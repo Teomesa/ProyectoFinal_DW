@@ -4,13 +4,15 @@ const cors = require('cors');
 const path = require('path');
 require('dotenv').config();
 
+// Importar rutas - asegúrate de que cada ruta se importe solo una vez
 const authRoutes = require('./routes/auth');
 const charcosRoutes = require('./routes/charcos');
 const adminRoutes = require('./routes/admin');
+const opinionsRoutes = require('./routes/opinions');
 
 const app = express();
 const frontendPath = path.join(__dirname, '../../frontend');
-console.log('Frontend path:', frontendPath); // Para debugging
+console.log('Frontend path:', frontendPath);
 
 // Asegurar que el directorio de uploads exista
 const uploadsDir = path.join(frontendPath, 'uploads/charcos');
@@ -31,11 +33,13 @@ app.use((req, res, next) => {
     next();
 });
 
-// API Routes - Primero procesar las rutas de la API
+// API Routes - asegúrate de que cada ruta se use solo una vez
 app.use('/api/auth', authRoutes);
 app.use('/api/charcos', charcosRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api', opinionsRoutes); 
 
+// Servir archivos estáticos
 app.use(express.static(frontendPath));
 app.use('/uploads/charcos', express.static(uploadsDir));
 
@@ -53,7 +57,7 @@ app.get('/admin.html', (req, res) => {
     res.sendFile(path.join(frontendPath, 'admin.html'));
 });
 
-// MOVER ESTA RUTA AL FINAL - para que no intercepte las rutas de la API
+// Ruta catch-all para el frontend
 app.get('*', (req, res) => {
     console.log('Ruta no encontrada:', req.path);
     

@@ -14,6 +14,9 @@ services:
       - type: bind
         source: ./frontend
         target: /usr/src/app/frontend
+      - type: bind
+        source: ./frontend/uploads/opinions
+        target: /usr/src/app/frontend/uploads/opinions
       - /usr/src/app/backend/node_modules
       - charcos_uploads:/usr/src/app/frontend/uploads/charcos
     working_dir: /usr/src/app/backend
@@ -31,7 +34,12 @@ services:
     restart: unless-stopped
     networks:
       - proyecto_final_network
-    command: sh -c "npm install wait-port && npx wait-port db:3306 && npm start"
+    command: >
+      sh -c "
+        npm install wait-port &&
+        npx wait-port db:3306 -t 60000 &&
+        npm start
+      "
 
   db:
     image: mysql:8.0
@@ -40,6 +48,9 @@ services:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
       - --default-time-zone=-05:00
+      - --max_allowed_packet=128M
+      - --innodb_log_file_size=256M
+      - --innodb_buffer_pool_size=512M
     ports:
       - "3306:3306"
     environment:
@@ -47,15 +58,15 @@ services:
       - MYSQL_USER=charcos_user
       - MYSQL_PASSWORD=2901
       - MYSQL_ROOT_PASSWORD=2901
-      - TZ=America/Bogota 
+      - TZ=America/Bogota
     volumes:
       - mysql_data:/var/lib/mysql
       - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p2901"]
-      interval: 5s
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p2901"]
+      interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 5
       start_period: 30s
     networks:
       - proyecto_final_network

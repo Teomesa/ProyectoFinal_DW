@@ -87,6 +87,51 @@
         <!-- Los charcos se cargarán aquí -->
     </div>
 
+        <!-- Modal de opiniones -->
+    <div id="opinion-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="charco-title">Opiniones de [Nombre del Charco]</h2>
+
+            <div class="rating-section">
+                <h3>Califica este charco</h3>
+                <div class="stars">
+                    <i class="far fa-star" data-rating="1"></i>
+                    <i class="far fa-star" data-rating="2"></i>
+                    <i class="far fa-star" data-rating="3"></i>
+                    <i class="far fa-star" data-rating="4"></i>
+                    <i class="far fa-star" data-rating="5"></i>
+                    <i class="far fa-star" data-rating="6"></i>
+                    <i class="far fa-star" data-rating="7"></i>
+                    <i class="far fa-star" data-rating="8"></i>
+                    <i class="far fa-star" data-rating="9"></i>
+                    <i class="far fa-star" data-rating="10"></i>
+                </div>
+                <div class="rating-text">Califica el charco donde 1 es muy malo y 10 es muy bueno</div>
+            </div>
+
+            <form id="opinion-form" class="opinion-form">
+                <div class="form-group">
+                    <label for="opinion-content">Tu opinión:</label>
+                    <textarea id="opinion-content" name="contenido" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="opinion-image">Imagen (opcional):</label>
+                    <input type="file" id="opinion-image" name="imagen" accept="image/*">
+                </div>
+
+                <button type="submit">Enviar opinión</button>
+            </form>
+
+            <div class="opinions-list">
+                <h3>Opiniones de otros usuarios</h3>
+                <div id="opinions-container"></div>
+            </div>
+        </div>
+    </div>
+
+
     <!-- Scripts -->
     <script type="module" src="js/services/authService.js"></script>
     <script type="module" src="js/charcos.js"></script>

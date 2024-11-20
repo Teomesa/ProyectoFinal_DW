@@ -403,4 +403,102 @@ router.delete('/charcos/:id', auth, async (req, res) => {
     }
 });
 
+router.get('/opinions', auth, async (req, res) => {
+    try {
+        const [opinions] = await pool.query(`
+            SELECT 
+                o.id_opinion,
+                o.contenido,
+                o.calificacion,
+                o.fecha_opinion,
+                o.imagen_url,
+                u.nombre as nombre_usuario,
+                c.nombre as charco_nombre,
+                o.id_charco
+            FROM opinion o
+            JOIN usuarios u ON o.id_usuario = u.id_usuario
+            JOIN charco c ON o.id_charco = c.id_charco
+            ORDER BY o.fecha_opinion DESC
+        `);
+
+        res.json(opinions);
+    } catch (error) {
+        console.error('Error al obtener opiniones:', error);
+        res.status(500).json({ message: 'Error al obtener las opiniones' });
+    }
+});
+
+// Ruta para eliminar una opinión
+router.delete('/opinions/:id', auth, async (req, res) => {
+    try {
+        const opinionId = req.params.id;
+        console.log('Iniciando eliminación de opinión:', opinionId);
+
+        // 1. Verificar si la opinión existe y obtener sus datos
+        const [opinions] = await pool.query(`
+            SELECT o.*, c.nombre as charco_nombre 
+            FROM opinion o 
+            JOIN charco c ON o.id_charco = c.id_charco 
+            WHERE o.id_opinion = ?
+        `, [opinionId]);
+
+        if (opinions.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'Opinión no encontrada'
+            });
+        }
+
+        const opinion = opinions[0];
+        const charcoId = opinion.id_charco;
+
+        // 2. Si hay una imagen, intentar eliminarla
+        if (opinion.imagen_url) {
+            try {
+                const imagePath = path.join(__dirname, '../../../frontend', opinion.imagen_url);
+                await fs.unlink(imagePath);
+                console.log('Imagen eliminada:', imagePath);
+            } catch (err) {
+                console.error('Error al eliminar imagen:', err);
+                // Continuamos incluso si hay error al eliminar la imagen
+            }
+        }
+
+        // 3. Eliminar la opinión
+        await pool.query('DELETE FROM opinion WHERE id_opinion = ?', [opinionId]);
+
+        // 4. Recalcular la calificación promedio del charco
+        const [avgResult] = await pool.query(`
+            SELECT COALESCE(ROUND(AVG(calificacion)), 0) as promedio 
+            FROM opinion 
+            WHERE id_charco = ?
+        `, [charcoId]);
+
+        // 5. Actualizar la calificación del charco
+        await pool.query(
+            'UPDATE charco SET calificacion = ? WHERE id_charco = ?',
+            [avgResult[0].promedio, charcoId]
+        );
+
+        // 6. Enviar respuesta exitosa
+        res.json({
+            success: true,
+            message: 'Opinión eliminada exitosamente',
+            data: {
+                charcoId: charcoId,
+                nuevaCalificacion: avgResult[0].promedio
+            }
+        });
+
+    } catch (error) {
+        console.error('Error al eliminar opinión:', error);
+        // Asegurarnos de que el servidor no se caiga y envíe una respuesta
+        res.status(500).json({
+            success: false,
+            message: 'Error al eliminar la opinión',
+            error: error.message
+        });
+    }
+});
+
 module.exports = router;

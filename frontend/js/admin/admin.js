@@ -9,6 +9,7 @@ class AdminPanel {
         this.setupEventListeners();
         await this.loadUsers();
         await this.loadCharcos();
+        await this.loadOpinions();
     }
 
     async checkAdminAuth() {
@@ -552,6 +553,124 @@ class AdminPanel {
         if (modal) {
             modal.style.display = 'none';
         }
+    }
+
+    async loadOpinions() {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch('http://localhost:3000/api/admin/opinions', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al cargar las opiniones');
+            }
+
+            const opinions = await response.json();
+            this.renderOpinionsTable(opinions);
+        } catch (error) {
+            console.error('Error al cargar opiniones:', error);
+            const container = document.querySelector('#opinions-tab .table-container');
+            if (container) {
+                container.innerHTML = `
+                    <div class="error-message">
+                        Error al cargar las opiniones: ${error.message}
+                    </div>
+                `;
+            }
+        }
+    }
+
+    async deleteOpinion(opinionId) {
+        try {
+            if (!confirm('¿Estás seguro de que quieres eliminar esta opinión?')) {
+                return;
+            }
+    
+            const token = localStorage.getItem('token');
+            if (!token) {
+                throw new Error('No se encontró token de autenticación');
+            }
+    
+            console.log('Iniciando eliminación de opinión:', opinionId);
+    
+            const response = await fetch(`http://localhost:3000/api/admin/opinions/${opinionId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            }).catch(error => {
+                console.error('Error en la petición fetch:', error);
+                throw new Error('Error de conexión con el servidor');
+            });
+    
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error al eliminar la opinión');
+            }
+    
+            const result = await response.json();
+    
+            if (result.success) {
+                // Recargar los datos
+                await Promise.all([
+                    this.loadOpinions(),
+                    this.loadCharcos()
+                ]);
+    
+                alert('Opinión eliminada exitosamente');
+            } else {
+                throw new Error(result.message || 'Error al eliminar la opinión');
+            }
+    
+        } catch (error) {
+            console.error('Error completo al eliminar opinión:', error);
+            alert(`Error: ${error.message}`);
+        }
+    }
+    
+    renderOpinionsTable(opinions) {
+        const tbody = document.querySelector('#opinions-table tbody');
+        if (!tbody) {
+            console.error('No se encontró el tbody de la tabla de opiniones');
+            return;
+        }
+
+        tbody.innerHTML = opinions.map(opinion => {
+            const rating = Math.min(Math.max(Number(opinion.calificacion) || 0, 0), 10);
+            const filledStars = '★'.repeat(rating);
+            const emptyStars = '☆'.repeat(10 - rating);
+
+            return `
+                <tr>
+                    <td>${opinion.id_opinion}</td>
+                    <td>${opinion.charco_nombre || 'Sin nombre'}</td>
+                    <td>${opinion.nombre_usuario || 'Usuario desconocido'}</td>
+                    <td>${opinion.contenido || ''}</td>
+                    <td>
+                        <div class="rating-display">
+                            <span class="stars-filled">${filledStars}</span>
+                            <span class="stars-empty">${emptyStars}</span>
+                            <span class="rating-number">${rating}/10</span>
+                        </div>
+                    </td>
+                    <td>${new Date(opinion.fecha_opinion).toLocaleDateString()}</td>
+                    <td>
+                        ${opinion.imagen_url ? 
+                            `<img src="${opinion.imagen_url}" alt="Imagen de opinión" class="opinion-thumbnail">` 
+                            : 'Sin imagen'}
+                    </td>
+                    <td>
+                        <button class="action-btn delete-btn" onclick="event.preventDefault(); adminPanel.deleteOpinion(${opinion.id_opinion});">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
     }
 }
 

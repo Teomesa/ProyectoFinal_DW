@@ -18,7 +18,9 @@ const connectWithRetry = async (retries = 5, delay = 5000) => {
 
             // Convertir el pool a promesas
             const promisePool = pool.promise();
-
+            pool.on('error', (err) => {
+                console.error('Error inesperado en el pool de base de datos:', err);
+            });
             // Verificar la conexión
             await promisePool.query('SELECT 1');
             console.log('Conexión a la base de datos establecida correctamente');

@@ -664,6 +664,158 @@ footer strong {
     transition: all 0.3s ease;
 }
 
+/* Estilos para el modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    overflow-y: auto;
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: linear-gradient(135deg, #2d3436 0%, #3d4567 100%);
+    color: white;
+    max-width: 800px;
+    width: 90%;
+    margin: 50px auto;
+    padding: 20px;
+    border-radius: 15px;
+    position: relative;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close:hover {
+    color: var(--accent);
+}
+
+/* Estilos para la sección de calificación */
+.rating-section {
+    text-align: center;
+    margin: 20px 0;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.stars {
+    font-size: 24px;
+    margin: 15px 0;
+}
+
+.stars i {
+    color: #ffe66d;
+    margin: 0 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.stars i:hover {
+    transform: scale(1.2);
+}
+
+/* Estilos para el formulario */
+.opinion-form {
+    margin: 20px 0;
+}
+
+.opinion-form textarea {
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    resize: vertical;
+    min-height: 100px;
+}
+
+.opinion-form input[type="file"] {
+    margin: 10px 0;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    width: 100%;
+}
+
+.opinion-form button {
+    background: var(--secondary);
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 15px;
+}
+
+.opinion-form button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(78, 205, 196, 0.3);
+}
+
+/* Estilos para las opiniones existentes */
+.opinions-list {
+    margin-top: 30px;
+}
+
+.opinion-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px 0;
+}
+
+.opinion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.opinion-user {
+    font-weight: bold;
+    color: var(--accent);
+}
+
+.opinion-rating {
+    color: #ffe66d;
+}
+
+.opinion-content {
+    margin: 10px 0;
+    line-height: 1.5;
+}
+
+.opinion-image {
+    max-width: 100%;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+.opinion-date {
+    font-size: 0.9em;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: right;
+}
+
 .tab-btn.active {
     background: var(--secondary);
     border-color: var(--secondary);
@@ -735,4 +887,138 @@ tr:hover {
 
 .delete-btn {
     color: var(--primary);
+}
+
+/* Estilos para el modal de opiniones */
+.rating-section {
+    text-align: center;
+    margin: 20px 0;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.stars {
+    font-size: 24px;
+    color: var(--accent);
+    cursor: pointer;
+    margin: 10px 0;
+}
+
+.stars i {
+    font-size: 24px;
+    margin: 0 3px;
+    cursor: pointer;
+    color: rgba(255, 230, 109, 0.3);
+    transition: all 0.3s ease;
+}
+
+.stars i.fas {
+    color: #ffe66d;
+}
+
+.stars i:hover,
+.stars i.active {
+    color: var(--accent);
+    transform: scale(1.2);
+}
+
+.stars-filled {
+    color: #ffe66d; /* Color para estrellas llenas */
+}
+
+.stars-empty {
+    color: rgba(255, 230, 109, 0.3); /* Color para estrellas vacías */
+}
+
+.stars-display {
+    display: flex;
+    gap: 2px;
+    margin-right: 8px;
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    padding: 5px 0;
+}
+
+.rating-text {
+    margin-top: 5px;
+    font-size: 0.9em;
+    color: var(--light);
+}
+
+.opinions-list {
+    margin-top: 30px;
+}
+
+.opinion-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px 0;
+}
+
+.opinion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.opinion-user {
+    font-weight: bold;
+    color: var(--accent);
+}
+
+.opinion-rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.opinion-content {
+    margin: 15px 0;
+    line-height: 1.5;
+}
+
+.opinion-image {
+    max-width: 100%;
+    border-radius: 8px;
+    margin: 10px 0;
+}
+.opinion-date {
+    font-size: 0.8em;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: right;
+}
+
+/* Estilos para la tarjeta de charco clickeable */
+.card {
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.card .rating {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+    padding: 8px 12px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.error-message {
+    color: #ff6b6b;
+    background: rgba(255, 107, 107, 0.1);
+    padding: 10px;
+    border-radius: 8px;
+    margin: 10px 0;
+    text-align: center;
 }

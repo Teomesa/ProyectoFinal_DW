@@ -174,7 +174,16 @@ const AuthModalManager = {
         });
 
         // Manejar cambios en el hash de la URL
-        window.addEventListener('hashchange', () => this.handleHash());
+        window.addEventListener('hashchange', () => {
+            if (this.debounceTimeout) {
+                clearTimeout(this.debounceTimeout);
+            }
+
+            this.debounceTimeout = setTimeout(() => {
+                this.handleHash();
+            }, 100);
+        });
+
         this.handleHash();
     },
 
@@ -193,12 +202,25 @@ const AuthModalManager = {
         if (modal) {
             modal.innerHTML = this.modalContent[type];
             modal.style.display = 'flex';
-            window.location.hash = `${type}-modal`;
+            requestAnimationFrame(() => {
+                if (window.location.hash !== `#${type}-modal`) {
+                    history.replaceState(null, '', `#${type}-modal`);
+                }
+            });
             
-            if (type === 'login') {
-                this.initLoginForm();
-            } else {
-                this.initRegisterForm();
+            switch(type) {
+                case 'login':
+                    this.initLoginForm();
+                    break;
+                case 'register':
+                    this.initRegisterForm();
+                    break;
+                case 'forgot':
+                    this.initForgotForm();
+                    break;
+                case 'reset':
+                    this.initResetForm();
+                    break;
             }
         }
     },
@@ -208,7 +230,9 @@ const AuthModalManager = {
             modal.style.display = 'none';
         });
         if (window.location.hash.includes('modal')) {
-            history.pushState('', document.title, window.location.pathname);
+            requestAnimationFrame(() => {
+                history.replaceState(null, '', window.location.pathname);
+            });
         }
     },
 
@@ -391,32 +415,11 @@ const AuthModalManager = {
                 }
             });
         }
-    },
-
-    showModal(type) {
-        this.closeModals();
-        const modal = document.getElementById(`${type}-modal`);
-        if (modal) {
-            modal.innerHTML = this.modalContent[type];
-            modal.style.display = 'flex';
-            window.location.hash = `${type}-modal`;
-            
-            switch(type) {
-                case 'login':
-                    this.initLoginForm();
-                    break;
-                case 'register':
-                    this.initRegisterForm();
-                    break;
-                case 'forgot':
-                    this.initForgotForm();
-                    break;
-                case 'reset':
-                    this.initResetForm();
-                    break;
-            }
-        }
     }
 };
+
+document.addEventListener('DOMContentLoaded', () => {
+    AuthModalManager.init();
+});
 
 export default AuthModalManager;

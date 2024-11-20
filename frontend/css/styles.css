@@ -242,25 +242,34 @@ html, body {
     z-index: 1000;
     justify-content: center;
     align-items: center;
+    will-change: display;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 }
 
 .modal-content {
     background: white;
+    margin: 5% auto;
     padding: 2rem;
     border-radius: 15px;
     width: 90%;
     max-width: 500px;
     position: relative;
     color: var(--dark);
+    will-change: transform;
+    transform: translateZ(0);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .close-modal {
     position: absolute;
     right: 20px;
-    top: 20px;
-    font-size: 24px;
+    top: 10px;
+    font-size: 28px;
     color: #666;
+    max-width: 800px;
+    border-radius: 10px;
+    position: relative;
     text-decoration: none;
     cursor: pointer;
     transition: color 0.3s ease;
