@@ -19,8 +19,7 @@ Cada charco se presentara en diseño de tarjetas que muestran información relev
 - Usuarios Comunes:
 Pueden explorar charcos, opinar, subir imágenes, guardar sitios favoritos y visualizar los charcos en tendencia según las opiniones.
 - Usuarios Administradores:
-Tienen permisos adicionales, como supervisar y moderar la plataforma, convertir a usuarios comunes en administradores, subir charcos nuevos con sus imagenes, y eliminar lugares o comentarios inapropiados.
-La constraseña para el usuario administrador por defecto será admin123
+Tienen permisos adicionales, como supervisar y moderar la plataforma, convertir a usuarios comunes en administradores, subir charcos nuevos con sus imagenes, y eliminar lugares o comentarios inapropiados. el usuario por defecto del administrador será admin@charcos.com y la constraseña para el usuario administrador por defecto será admin123
 
 # Tecnologías Utilizadas
 - HTML y CSS: Para la estructura y estilo del contenido, creando una interfaz atractiva y organizada.
